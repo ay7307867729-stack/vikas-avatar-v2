@@ -41,23 +41,23 @@ def chat():
     try:
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-messages=[
-    {
-        "role": "system",
-        "content": f"""
-        Tum Vikas ke personal AI assistant ho.
-        Vikas ki memory:
-        {memory}
-        """
-    },
-    {
-        "role": "user",
-        "content": message
-    }
-]
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"""
+                    Tum Vikas ke personal AI assistant ho.
+                    Vikas ki memory:
+                    {memory}
+                    """
+                },
+                {
+                    "role": "user",
+                    "content": message
+                }
+            ]
         )
 
-                reply = response.choices[0].message.content
+        reply = response.choices[0].message.content
 
         return jsonify({
             "reply": reply
@@ -70,7 +70,3 @@ messages=[
         return jsonify({
             "reply": str(e)
         }), 500
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
