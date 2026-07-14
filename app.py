@@ -57,17 +57,20 @@ messages=[
 ]
         )
 
-        reply = response.choices[0].message.content
+                reply = response.choices[0].message.content
 
         return jsonify({
             "reply": reply
         })
 
     except Exception as e:
-        print("ERROR:", e)
+        import traceback
+        traceback.print_exc()
+
         return jsonify({
-            "error": str(e)
+            "reply": str(e)
         }), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
