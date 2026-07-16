@@ -1,6 +1,30 @@
 {
-    "name": "Vikas",
-    "project": "Vikas App 3D AI Avatar",
-    "language": "Hindi",
-    "goal": "AI avatar banana"
+  "name": "Vikas Yadav",
+  "project": "Vikas App 3D AI Avatar",
+  "language": "Hindi",
+  "goal": "AI avatar banana",
+  "bio": "Student of B.Com at KUK who wants to build an AI project with a 3D avatar, AI chat, voice input/output, and website integration.",
+  "skills": [
+    "Python",
+    "Flask",
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "Three.js",
+    "Blender",
+    "GitHub",
+    "Render"
+  ],
+  "personal": {
+    "ambition": "Financially strong banna aur apna AI assistant banana",
+    "learningStyle": "Step-by-step seekhna aur khud project banana",
+    "health": "Fitness improve karna, weight gain, discipline aur phone/reels time kam karna",
+    "work": "Kabhi kabhi halwai helper ka kaam bhi karta hoon"
+  },
+  "history": [
+    {
+      "user": "हेलो हेलो",
+      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+    }
+  ]
 }

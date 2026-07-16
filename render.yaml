@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vikas-avtar
+    env: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash -lc 'if [ -n "$GOOGLE_SA_JSON" ]; then echo "$GOOGLE_SA_JSON" > /tmp/key.json && export GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json; fi; gunicorn app:app -w 4 -b 0.0.0.0:$PORT'
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_SA_JSON
+        sync: false

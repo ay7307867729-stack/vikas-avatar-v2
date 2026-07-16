@@ -48,10 +48,28 @@ h1 {
 }
 
 .controls button {
-    padding: 12px 25px;
+    padding: 14px 30px;
     margin: 5px;
-    border-radius: 25px;
+    border-radius: 35px;
     border: none;
     cursor: pointer;
     font-size: 16px;
+    background: linear-gradient(135deg, #ff6a00 0%, #ffd500 100%);
+    color: #111;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 15px 35px rgba(255, 123, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
+
+.controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(255, 123, 0, 0.35);
+}
+
+.controls button:active {
+    transform: translateY(0);
+    box-shadow: 0 12px 25px rgba(255, 123, 0, 0.3);
+}
+
+

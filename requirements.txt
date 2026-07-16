@@ -1,3 +1,4 @@
 Flask
 gunicorn
 groq
+google-cloud-texttospeech>=2.15.0
