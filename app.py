@@ -56,11 +56,12 @@ print("Loaded memory:", memory)
 api_key = os.environ.get("GROQ_API_KEY")
 
 if not api_key:
-    print("GROQ_API_KEY missing")
-
-client = Groq(
-    api_key=api_key.strip()
-)
+    print("GROQ_API_KEY missing. /chat endpoint will not work until it is set.")
+    client = None
+else:
+    client = Groq(
+        api_key=api_key.strip()
+    )
 
 
 @app.route("/")
@@ -79,6 +80,11 @@ def chat():
     message = data.get("message")
 
     try:
+        if client is None:
+            return jsonify({
+                "reply": "Error: GROQ_API_KEY missing. Please set the environment variable and restart the server."
+            }), 500
+
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
@@ -96,10 +102,9 @@ Tumne pehle baatein ki thi ki tum kabhi kabhi halwai helper ka kaam bhi karte ho
 Vikas ki memory:
 {json.dumps(memory, ensure_ascii=False, indent=2)}
 
-Tumhara 3D avatar yaad rakhega jo bhi user bolega.
-Agar user ka question hua, to usko previous chat history ke hisab se reply do.
-
-Hindi me friendly aur confident reply do, jaisa Vikas bolta.
+Agar user tumse pehle poochta hai "Tum kaun ho?", ek baar bolo "Main Vikas hoon." uske baad phir sirf seedha jawab do.
+Baar-baar apna parichay mat do. Simple, chhota, Hindi mein reply do.
+Yadi user seedha sawaal poochta hai, toh seedha jawab de.
 """
                 },
                 {
