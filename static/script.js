@@ -36,32 +36,37 @@ recognition.onresult = async (event) => {
     const text = event.results[0][0].transcript;
 
     talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Thinking...`;
+    triggerTalkAnimation();
 
-    // Gemini ko message bhejna
-    const response = await fetch("/chat", {
+    try {
+        // Gemini ko message bhejna
+        const response = await fetch("/chat", {
 
-        method: "POST",
+            method: "POST",
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-        body: JSON.stringify({
-            message: text
-        })
+            body: JSON.stringify({
+                message: text
+            })
 
-    });
+        });
 
 
-    const data = await response.json();
-    const responseParagraph = document.getElementById("response");
-    responseParagraph.textContent = "";
+        const data = await response.json();
+        const responseParagraph = document.getElementById("response");
+        responseParagraph.textContent = "";
 
-    // Use browser TTS with a normal female voice.
-    await speak(data.reply);
+        // Use browser TTS with a normal female voice.
+        await speak(data.reply);
 
-    responseParagraph.textContent = "";
-    talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        responseParagraph.textContent = "";
+    } finally {
+        stopTalkAnimation();
+        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+    }
 
 };
 
@@ -192,11 +197,27 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 let avatarModel = null;
+let avatarRoot = null;
 let motionGroup = null;
 let mixer = null;
 const clock = new THREE.Clock();
 let walkPhase = 0;
 const walkSpeed = 0.9;
+let talking = false;
+let talkPulse = 0;
+let avatarTargetX = 0;
+let avatarTargetY = 0;
+let avatarTargetZ = 0;
+let avatarCurrentX = 0;
+let avatarCurrentY = 0;
+let avatarCurrentZ = 0;
+let animatedBones = [];
+const boneRestRotations = new Map();
+let eyeTargets = [];
+let blinkAmount = 0;
+let blinkTimer = 0;
+const eyeRestRotations = new Map();
+const eyeRestScales = new Map();
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
@@ -257,24 +278,15 @@ loader.load(
     function (gltf) {
         const avatar = gltf.scene;
         avatarModel = avatar;
-        avatar.scale.set(2.8, 2.8, 2.8);
-        scene.add(avatar);
+        avatarRoot = new THREE.Group();
+        avatarRoot.add(avatar);
+        scene.add(avatarRoot);
 
         const box = new THREE.Box3().setFromObject(avatar);
         const size = new THREE.Vector3();
         const center = new THREE.Vector3();
         box.getSize(size);
         box.getCenter(center);
-
-        avatar.position.y -= center.y;
-        avatar.position.y -= size.y * 0.05;
-
-        const distance = Math.max(size.x, size.y, size.z) * 2.2;
-        camera.position.set(0, size.y * 0.8, distance);
-        camera.near = distance / 100;
-        camera.far = distance * 10;
-        camera.updateProjectionMatrix();
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         avatar.traverse((child) => {
             if (child.isMesh) {
@@ -294,6 +306,57 @@ loader.load(
             }
         });
 
+        const distance = Math.max(size.x, size.y, size.z) * 2.2;
+        camera.position.set(0, size.y * 0.8, distance);
+        camera.near = distance / 100;
+        camera.far = distance * 10;
+        camera.updateProjectionMatrix();
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        avatarCurrentX = avatar.position.x;
+        avatarCurrentY = avatar.position.y;
+        avatarCurrentZ = avatar.position.z;
+        avatarTargetX = avatar.position.x;
+        avatarTargetY = avatar.position.y;
+        avatarTargetZ = avatar.position.z;
+
+        animatedBones = [];
+        boneRestRotations.clear();
+        eyeTargets = [];
+        eyeRestRotations.clear();
+        eyeRestScales.clear();
+        avatarRoot.traverse((child) => {
+            if (child.isBone) {
+                const name = child.name.toLowerCase();
+                const isBodyBone = /hand|wrist|finger|forearm|arm|upperarm|shoulder|clav|spine|neck|head/.test(name);
+                if (isBodyBone) {
+                    animatedBones.push(child);
+                    boneRestRotations.set(child.uuid, {
+                        x: child.rotation.x,
+                        y: child.rotation.y,
+                        z: child.rotation.z
+                    });
+                }
+
+                if (/eye|eyelid|lid/.test(name)) {
+                    eyeTargets.push({ type: 'bone', object: child });
+                    eyeRestRotations.set(child.uuid, {
+                        x: child.rotation.x,
+                        y: child.rotation.y,
+                        z: child.rotation.z
+                    });
+                }
+            }
+
+            if (child.isMesh) {
+                const name = child.name.toLowerCase();
+                if (/eye|eyelid|lid/.test(name)) {
+                    eyeTargets.push({ type: 'mesh', object: child });
+                    eyeRestScales.set(child.uuid, child.scale.clone());
+                }
+            }
+        });
+
         console.log("GLB loaded successfully", avatar);
     },
     function (xhr) {
@@ -309,27 +372,120 @@ loader.load(
 const axesHelper = new THREE.AxesHelper(2);
 scene.add(axesHelper);
 
-function animate(){
+function triggerTalkAnimation() {
+    talking = true;
+    talkPulse = Math.max(talkPulse, 0.7);
+    avatarTargetX = 0.55;
+    avatarTargetY = 0.06;
+    avatarTargetZ = -0.12;
+}
+
+function stopTalkAnimation() {
+    talking = false;
+    avatarTargetX = 0;
+    avatarTargetY = 0;
+    avatarTargetZ = 0;
+}
+
+function animate() {
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
+    walkPhase += delta * walkSpeed;
 
-    if (avatarModel) {
-        avatarModel.rotation.y += delta * 0.18;
-        walkPhase += delta * walkSpeed;
-        avatarModel.position.y = Math.sin(walkPhase * 1.2) * 0.03;
-        avatarModel.position.x = Math.sin(walkPhase * 0.5) * 0.02;
+    if (talking) {
+        talkPulse = Math.min(1, talkPulse + delta * 4.2);
+    } else {
+        talkPulse = Math.max(0, talkPulse - delta * 2.1);
+    }
 
-        const armSwing = Math.sin(walkPhase * 1.6) * 0.2;
-        avatarModel.traverse((child) => {
-            if (child.isBone && child.name.toLowerCase().includes('arm')) {
-                child.rotation.z = armSwing;
+    if (avatarModel && avatarRoot) {
+        avatarCurrentX += (avatarTargetX - avatarCurrentX) * Math.min(1, delta * 2.8);
+        avatarCurrentY += (avatarTargetY - avatarCurrentY) * Math.min(1, delta * 2.8);
+        avatarCurrentZ += (avatarTargetZ - avatarCurrentZ) * Math.min(1, delta * 2.8);
+
+        const idleBob = Math.sin(walkPhase * 2.4) * 0.03;
+        const sway = talking ? Math.sin(walkPhase * 6.5) * 0.18 : Math.sin(walkPhase * 1.8) * 0.05;
+        const lean = talking ? 0.12 : 0.03;
+
+        avatarRoot.position.set(avatarCurrentX, avatarCurrentY + idleBob, avatarCurrentZ);
+        avatarRoot.rotation.y = sway;
+        avatarRoot.rotation.z = talking ? 0.08 : 0.02;
+        avatarRoot.rotation.x = lean;
+    }
+
+    if (animatedBones.length) {
+        animatedBones.forEach((bone, index) => {
+            const name = bone.name.toLowerCase();
+            const rest = boneRestRotations.get(bone.uuid) || { x: 0, y: 0, z: 0 };
+            const phase = walkPhase * 6 + index * 0.55;
+            const leftSide = name.includes('left');
+            const isArm = /arm|forearm|upperarm|shoulder|clav/.test(name);
+            const isHand = /hand|wrist|finger/.test(name);
+            const isBody = /spine|neck|head/.test(name);
+
+            if (talking) {
+                if (isHand) {
+                    bone.rotation.z = Math.sin(phase) * 0.35 + (leftSide ? 0.08 : -0.08);
+                    bone.rotation.x = 0.16 + Math.sin(phase * 1.2) * 0.05;
+                } else if (isArm) {
+                    bone.rotation.z = Math.sin(phase) * 0.22 + (leftSide ? 0.05 : -0.05);
+                    bone.rotation.x = 0.06 + Math.sin(phase * 0.9) * 0.03;
+                } else if (isBody) {
+                    bone.rotation.y = Math.sin(phase * 0.6) * 0.08;
+                    bone.rotation.z = Math.sin(phase * 0.4) * 0.04;
+                }
+            } else {
+                bone.rotation.x = rest.x;
+                bone.rotation.y = rest.y;
+                bone.rotation.z = rest.z;
             }
         });
     }
 
-    if (mixer) {
-        mixer.update(delta);
+    blinkTimer -= delta;
+    if (blinkTimer <= 0) {
+        blinkTimer = talking ? 0.35 + Math.random() * 0.25 : 1.2 + Math.random() * 2.5;
+        blinkAmount = 1;
+    }
+
+    if (blinkAmount > 0) {
+        blinkAmount = Math.max(0, blinkAmount - delta * 8.5);
+    }
+
+    if (eyeTargets.length) {
+        const blinkValue = Math.max(0, blinkAmount);
+        eyeTargets.forEach((entry) => {
+            const name = entry.object.name.toLowerCase();
+
+            if (entry.type === 'bone') {
+                const rest = eyeRestRotations.get(entry.object.uuid) || { x: 0, y: 0, z: 0 };
+                if (/eyelid|lid/.test(name)) {
+                    entry.object.rotation.x = rest.x + blinkValue * 0.55 + (talking ? 0.02 : 0);
+                    entry.object.rotation.z = rest.z + (talking ? 0.04 : 0);
+                } else if (/eye/.test(name)) {
+                    entry.object.rotation.x = rest.x + (talking ? 0.01 : 0);
+                    entry.object.rotation.y = rest.y + (talking ? 0.01 : 0);
+                }
+            } else if (entry.type === 'mesh') {
+                const restScale = eyeRestScales.get(entry.object.uuid);
+                if (restScale) {
+                    if (/eyelid|lid/.test(name)) {
+                        const closeAmount = Math.max(0.05, 1 - blinkValue * 0.9);
+                        entry.object.scale.set(restScale.x, restScale.y * closeAmount, restScale.z * closeAmount);
+                    } else if (/eye/.test(name)) {
+                        const openness = Math.max(0.9, 1 - blinkValue * 0.08);
+                        entry.object.scale.set(restScale.x * openness, restScale.y * openness, restScale.z * openness);
+                    }
+                }
+            }
+        });
+    }
+
+    if (camera) {
+        camera.position.x = Math.sin(walkPhase * 0.45) * 0.12;
+        camera.position.y = 1.2 + Math.sin(walkPhase * 0.9) * 0.03;
+        camera.lookAt(new THREE.Vector3(0, 0.2, 0));
     }
 
     renderer.render(scene, camera);

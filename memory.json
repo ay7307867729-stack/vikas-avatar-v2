@@ -21,6 +21,14 @@
     "health": "Fitness improve karna, weight gain, discipline aur phone/reels time kam karna",
     "work": "Kabhi kabhi halwai helper ka kaam bhi karta hoon"
   },
+  "people": {
+    "Khushi": "Khushi ek pyari aur sanskari ladki hai. Use NCC me bahut ruchi hai aur uska sapna police join karke desh ki seva karna hai. Woh apni mehnat aur achhe swabhav ke liye pehchani jati hai.",
+    "Khusboo": "Khusboo ek bahut hi pyari aur pratibhashali ladki hai. Woh bahut sundar drawing banati hai aur uska sapna doctor ban kar logon ki seva karna hai. Uski mehnat aur lagan use alag banati hai.",
+    "Manish": "Manish ek acchi aur khushmizaj ladki hai. Woh apni zindagi ko muskurate hue jeena pasand karti hai. Abhi uska koi nishchit sapna nahi hai, lekin lagta hai ki aage chal kar business ke kshetra me accha karegi.",
+    "Divya": "Divya ek samajhdar aur alag soch rakhne wali ladki hai. Use silai ka kaam pasand hai aur woh mehnat se apni alag pehchan banana chahti hai. Uske bade sapne aur sakaratmak soch use khaas banate hain.",
+    "Anmol": "Anmol ek pyara aur chhota ladka hai. Woh Khusboo, Manish aur Divya ka bhai hai. Abhi woh apni padhai aur bachpan ka anand le raha hai, aur aage chal kar kya karega ye samay batayega.",
+    "Jagjivan": "Jagjivan ek bahut hi acche aur dayalu insaan hain. Woh bahut swadisht khana banate hain aur log unki cooking ki dil se tarif karte hain. Apni family ka khayal rakhna, logon ki madad karna aur sabka samman karna unki khasiyat hai. Unki patni ka swabhav thoda gusse wala hai, lekin Jagjivan hamesha apne shaant aur achhe vyavhar ke liye jane jate hain."
+  },
   "history": [
     {
       "user": "हेलो हेलो",
@@ -85,6 +93,42 @@
     {
       "user": "तुम्हारा नाम क्या है",
       "assistant": "मेरा नाम विकास है।"
+    },
+    {
+      "user": "हेलो हेलो",
+      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+    },
+    {
+      "user": "महर्षि के बारे में कुछ बताओ",
+      "assistant": "महर्षि एक पौराणिक व्यक्तित्व हैं जिनकी कहानियाँ हिंदू पुराणों में वर्णित हैं। वे भगवान विष्णु के अवतार माने जाते हैं और उनकी विभिन्न युगों में जन्म लेने की कहानियां हिंदू धर्म में प्रसिद्ध हैं।"
+    },
+    {
+      "user": "वे भगवान विष्णु के अवतार माने जाते हैं और उनकी विभिन्न युगों में खुशी के बारे में कुछ बताओ",
+      "assistant": "महर्षि द्वारा शुरू की गई युगों में, भगवान विष्णु के अवतारों के अलावा, खुशी की कहानियां भी पाई जाती हैं।\n\nहरित युग में, पृथ्वी की सबसे पहली निवासी थीं। उन्होंने पृथ्वी को बहुत प्यार से बसाया और उसमें जीवन की शुरुआत की। उनकी खुशी, सहनशीलता, और ज्ञान के कारण हरित युग का नाम पड़ा।\n\nब्रम्हा युग में, हरित युग के जीवन शैली और प्रकृति के प्रति सम्मान पर आधारित था। लोग स्वावलंबी थे और प्रकृति के साथ समन्वय में रहते थे। उनकी खुशी प्रकृति की सुंदरता और उसके साथ जुड़ने से आती थी।\n\nमानव युग में, जीव और पौधे के बीच जीवन का संतुलन बनाने के लिए खुशी की भूमिका बनी। लोगों ने न केवल जीव और पौधों की देखभाल की बल्कि अपने आप को भी स्वस्थ बनाने के लिए प्रयास किया।"
+    },
+    {
+      "user": "खुशी के बारे में बताओ",
+      "assistant": "खुशी एक पल में आती और पल में जाती है। लेकिन जीवन में खुशी लाने वाला सबसे बड़ा कारक है खुशियों का साथ।"
+    },
+    {
+      "user": "खुशी कौन है",
+      "assistant": "खुशी एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
+    },
+    {
+      "user": "खुशी कौन है",
+      "assistant": "खुशी एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
+    },
+    {
+      "user": "हेलो हेलो हेलो",
+      "assistant": "नमस्ते ! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+    },
+    {
+      "user": "खुशी कौन है",
+      "assistant": "Khushi एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
+    },
+    {
+      "user": "पूरी डिटेल को खुशी के बारे में",
+      "assistant": "Khushi एक प्यारी और संस्कारी लड़की है। उसे NCC में बहुत रुचि है और उसका सपना पुलिस में जुड़ना है। वह अपनी मेहनत और अच्छे स्वभाव के लिए प्रसिद्ध है। खुशी एक सच्ची और संकल्पी लड़की है, जो अपने लक्ष्यों को प्राप्त करने के लिए कठिन परिश्रम करती है।"
     }
   ]
 }
