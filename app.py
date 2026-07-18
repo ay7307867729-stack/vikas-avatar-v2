@@ -5,6 +5,9 @@ import json
 from flask import Flask, render_template, request, jsonify
 from groq import Groq
 import io
+import requests
+from datetime import datetime
+from user_agents import parse
 from flask import send_file
 
 # Optional Google Cloud Text-to-Speech. If not installed or not configured,
@@ -16,6 +19,23 @@ except Exception:
     texttospeech = None
 
 app = Flask(__name__)
+
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+def send_telegram_notification(message):
+    if not BOT_TOKEN or not CHAT_ID:
+        return
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+    try:
+        requests.post(url, json={
+            "chat_id": CHAT_ID,
+            "text": message
+        }, timeout=10)
+    except Exception as e:
+        print("Telegram Error:", e)
 
 
 # Simple CORS for local testing to avoid browser "Failed to fetch" when
@@ -66,6 +86,44 @@ else:
 
 @app.route("/")
 def home():
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    browser = request.user_agent.browser or "Unknown"
+    platform = request.user_agent.platform or "Unknown"
+    time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+    message = f"""
+🔔 New Visitor
+
+🌐 IP: {ip}
+📱 Device: {platform}
+🌍 Browser: {browser}
+🕒 Time: {time}
+"""
+
+    try:
+        country = "Unknown"
+        state = "Unknown"
+        city = "Unknown"
+
+        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=3)
+
+        if res.status_code == 200:
+            data = res.json()
+            country = data.get("country", "Unknown")
+            state = data.get("regionName", "Unknown")
+            city = data.get("city", "Unknown")
+
+        message += f"""
+🌍 Country: {country}
+🏛️ State: {state}
+🏙️ City: {city}
+"""
+
+    except Exception as e:
+        print(e)
+
+    send_telegram_notification(message)
+
     return render_template("index.html")
 
 
