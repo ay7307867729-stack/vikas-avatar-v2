@@ -282,6 +282,7 @@ Yadi user seedha sawaal poochta hai, toh seedha jawab de.
 def tts():
     data = request.json or {}
     text = data.get('text', '')
+
     if not text:
         return jsonify({'error': 'no text provided'}), 400
 
@@ -290,11 +291,11 @@ def tts():
 
     try:
         client = texttospeech.TextToSpeechClient()
-        # Choose a natural Hindi female WaveNet voice.
+
         voice = texttospeech.VoiceSelectionParams(
             language_code='hi-IN',
-            name='hi-IN-Wavenet-A',
-            ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
+            name='hi-IN-Neural2-B',
+            ssml_gender=texttospeech.SsmlVoiceGender.MALE
         )
 
         audio_config = texttospeech.AudioConfig(
@@ -306,10 +307,20 @@ def tts():
         )
 
         synthesis_input = texttospeech.SynthesisInput(text=text)
-        response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
 
         audio_bytes = response.audio_content
-        return send_file(io.BytesIO(audio_bytes), mimetype='audio/wav', download_name='speech.wav')
+
+        return send_file(
+            io.BytesIO(audio_bytes),
+            mimetype='audio/wav',
+            download_name='speech.wav'
+        )
 
     except Exception as e:
         import traceback
