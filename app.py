@@ -101,26 +101,34 @@ def home():
 """
 
     try:
-        country = "Unknown"
-        state = "Unknown"
-        city = "Unknown"
+    country = "Unknown"
+    state = "Unknown"
+    city = "Unknown"
 
-        res = requests.get(f"http://ip-api.com/json/{ip}", timeout=3)
+    res = requests.get(
+        f"https://ip-api.com/json/{ip}?fields=status,country,regionName,city",
+        timeout=5
+    )
 
-        if res.status_code == 200:
-            data = res.json()
+    print("IP:", ip)
+    print("API DATA:", res.text)
+
+    if res.status_code == 200:
+        data = res.json()
+
+        if data.get("status") == "success":
             country = data.get("country", "Unknown")
             state = data.get("regionName", "Unknown")
             city = data.get("city", "Unknown")
 
-        message += f"""
+    message += f"""
 🌍 Country: {country}
 🏛️ State: {state}
 🏙️ City: {city}
 """
 
-    except Exception as e:
-        print(e)
+except Exception as e:
+    print(e)
 
     send_telegram_notification(message)
 
