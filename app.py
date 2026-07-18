@@ -86,34 +86,47 @@ else:
 
 @app.route("/")
 def home():
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    browser = request.user_agent.browser or "Unknown"
-    platform = request.user_agent.platform or "Unknown"
+    ip = (
+        request.headers.get("CF-Connecting-IP")
+        or request.headers.get("X-Forwarded-For")
+        or request.remote_addr
+    )
+
+    if "," in ip:
+        ip = ip.split(",")[0].strip()
+
+    ua_string = request.headers.get("User-Agent", "")
+    ua = parse(ua_string)
+
+    browser = ua.browser.family or "Unknown"
+    device = ua.device.family or "Unknown"
+    platform = ua.os.family or "Unknown"
+
     time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
     message = f"""
 🔔 New Visitor
 
 🌐 IP: {ip}
-📱 Device: {platform}
+📱 Device: {device}
+💻 OS: {platform}
 🌍 Browser: {browser}
 🕒 Time: {time}
 """
 
     try:
-    country = "Unknown"
-    state = "Unknown"
-    city = "Unknown"
+        country = "Unknown"
+        state = "Unknown"
+        city = "Unknown"
 
-    res = requests.get(
-        f"https://ip-api.com/json/{ip}?fields=status,country,regionName,city",
-        timeout=5
-    )
+        res = requests.get(
+            f"https://ip-api.com/json/{ip}?fields=status,country,regionName,city",
+            timeout=5
+        )
 
-    print("IP:", ip)
-    print("API DATA:", res.text)
+        print("IP:", ip)
+        print("API DATA:", res.text)
 
-    if res.status_code == 200:
         data = res.json()
 
         if data.get("status") == "success":
@@ -121,14 +134,14 @@ def home():
             state = data.get("regionName", "Unknown")
             city = data.get("city", "Unknown")
 
-    message += f"""
+        message += f"""
 🌍 Country: {country}
 🏛️ State: {state}
 🏙️ City: {city}
 """
 
-except Exception as e:
-    print(e)
+    except Exception as e:
+        print("Location Error:", e)
 
     send_telegram_notification(message)
 
