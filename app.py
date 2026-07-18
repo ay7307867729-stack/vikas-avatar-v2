@@ -7,7 +7,10 @@ from groq import Groq
 import io
 import requests
 from datetime import datetime
-from user_agents import parse
+try:
+    from user_agents import parse
+except Exception:
+    parse = None
 from flask import send_file
 
 # Optional Google Cloud Text-to-Speech. If not installed or not configured,
@@ -36,6 +39,69 @@ def send_telegram_notification(message):
         }, timeout=10)
     except Exception as e:
         print("Telegram Error:", e)
+
+
+def lookup_geo(ip):
+    if not ip:
+        return {
+            "country": "Unknown",
+            "state": "Unknown",
+            "city": "Unknown"
+        }
+
+    services = [
+        {
+            "name": "ipwhois",
+            "url": f"https://ipwhois.app/json/{ip}",
+            "success_key": "success",
+            "data_map": {"country": "country", "state": "region", "city": "city"}
+        },
+        {
+            "name": "ipinfo",
+            "url": f"https://ipinfo.io/{ip}/json",
+            "success_key": None,
+            "data_map": {"country": "country", "state": "region", "city": "city"}
+        },
+        {
+            "name": "ip-api",
+            "url": f"http://ip-api.com/json/{ip}?fields=status,country,regionName,city",
+            "success_key": "status",
+            "success_value": "success",
+            "data_map": {"country": "country", "state": "regionName", "city": "city"}
+        }
+    ]
+
+    for service in services:
+        try:
+            res = requests.get(service["url"], timeout=5)
+            data = res.json()
+            print(f"Geo {service['name']} status:", res.status_code, data)
+
+            if service["success_key"]:
+                if service["success_value"]:
+                    if data.get(service["success_key"]) != service["success_value"]:
+                        continue
+                elif not data.get(service["success_key"]):
+                    continue
+
+            country = data.get(service["data_map"]["country"], "Unknown")
+            state = data.get(service["data_map"]["state"], "Unknown")
+            city = data.get(service["data_map"]["city"], "Unknown")
+
+            if country or state or city:
+                return {
+                    "country": country or "Unknown",
+                    "state": state or "Unknown",
+                    "city": city or "Unknown"
+                }
+        except Exception as e:
+            print(f"Geo lookup {service['name']} error:", e)
+
+    return {
+        "country": "Unknown",
+        "state": "Unknown",
+        "city": "Unknown"
+    }
 
 
 # Simple CORS for local testing to avoid browser "Failed to fetch" when
@@ -84,6 +150,7 @@ else:
     )
 
 
+
 @app.route("/")
 def home():
     ip = (
@@ -96,11 +163,15 @@ def home():
         ip = ip.split(",")[0].strip()
 
     ua_string = request.headers.get("User-Agent", "")
-    ua = parse(ua_string)
-
-    browser = ua.browser.family or "Unknown"
-    device = ua.device.family or "Unknown"
-    platform = ua.os.family or "Unknown"
+    if parse is not None:
+        ua = parse(ua_string)
+        browser = ua.browser.family or "Unknown"
+        device = ua.device.family or "Unknown"
+        platform = ua.os.family or "Unknown"
+    else:
+        browser = "Unknown"
+        device = "Unknown"
+        platform = "Unknown"
 
     time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
@@ -115,24 +186,13 @@ def home():
 """
 
     try:
-        country = "Unknown"
-        state = "Unknown"
-        city = "Unknown"
-
-        res = requests.get(
-            f"https://ip-api.com/json/{ip}?fields=status,country,regionName,city",
-            timeout=5
-        )
+        geo = lookup_geo(ip)
+        country = geo["country"]
+        state = geo["state"]
+        city = geo["city"]
 
         print("IP:", ip)
-        print("API DATA:", res.text)
-
-        data = res.json()
-
-        if data.get("status") == "success":
-            country = data.get("country", "Unknown")
-            state = data.get("regionName", "Unknown")
-            city = data.get("city", "Unknown")
+        print(f"Geo location: {country}, {state}, {city}")
 
         message += f"""
 🌍 Country: {country}
