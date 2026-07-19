@@ -1,336 +1,286 @@
+# app.py
 from dotenv import load_dotenv
 load_dotenv()
+
 import os
 import json
-from flask import Flask, render_template, request, jsonify
-from groq import Groq
 import io
-import requests
+import logging
 from datetime import datetime
-try:
-    from user_agents import parse
-except Exception:
-    parse = None
-from flask import send_file
+from flask import Flask, render_template, request, jsonify, send_file, make_response
 
-# Optional Google Cloud Text-to-Speech. If not installed or not configured,
-# the /tts endpoint will return an error and the client will fall back to
-# browser SpeechSynthesis.
+# Optional imports
+try:
+    from user_agents import parse as parse_ua
+except Exception:
+    parse_ua = None
+
 try:
     from google.cloud import texttospeech
 except Exception:
     texttospeech = None
 
-app = Flask(__name__)
+# Groq client (import may raise if package missing)
+try:
+    from groq import Groq
+except Exception:
+    Groq = None
 
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+import requests
 
-def send_telegram_notification(message):
-    if not BOT_TOKEN or not CHAT_ID:
-        return
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("vikas-avatar")
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+app = Flask(__name__, static_folder="static", template_folder="templates")
 
+# Environment variables
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or None
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or None
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") or None
+
+# Initialize Groq client safely
+client = None
+if GROQ_API_KEY and Groq is not None:
     try:
-        requests.post(url, json={
-            "chat_id": CHAT_ID,
-            "text": message
-        }, timeout=10)
+        client = Groq(api_key=GROQ_API_KEY.strip())
+        logger.info("GROQ client initialized")
     except Exception as e:
-        print("Telegram Error:", e)
+        logger.warning("Failed to initialize GROQ client: %s", e)
+else:
+    if not GROQ_API_KEY:
+        logger.warning("GROQ_API_KEY not set; /chat will return an error")
+    if Groq is None:
+        logger.warning("groq package not available; /chat will return an error")
 
+# Memory helpers
+MEMORY_FILE = "memory.json"
 
-def lookup_geo(ip):
-    if not ip:
-        return {
-            "country": "Unknown",
-            "state": "Unknown",
-            "city": "Unknown"
-        }
-
-    services = [
-        {
-            "name": "ipwhois",
-            "url": f"https://ipwhois.app/json/{ip}",
-            "success_key": "success",
-            "data_map": {"country": "country", "state": "region", "city": "city"}
-        },
-        {
-            "name": "ipinfo",
-            "url": f"https://ipinfo.io/{ip}/json",
-            "success_key": None,
-            "data_map": {"country": "country", "state": "region", "city": "city"}
-        },
-        {
-            "name": "ip-api",
-            "url": f"http://ip-api.com/json/{ip}?fields=status,country,regionName,city",
-            "success_key": "status",
-            "success_value": "success",
-            "data_map": {"country": "country", "state": "regionName", "city": "city"}
-        }
-    ]
-
-    for service in services:
-        try:
-            res = requests.get(service["url"], timeout=5)
-            data = res.json()
-            print(f"Geo {service['name']} status:", res.status_code, data)
-
-            if service["success_key"]:
-                if service["success_value"]:
-                    if data.get(service["success_key"]) != service["success_value"]:
-                        continue
-                elif not data.get(service["success_key"]):
-                    continue
-
-            country = data.get(service["data_map"]["country"], "Unknown")
-            state = data.get(service["data_map"]["state"], "Unknown")
-            city = data.get(service["data_map"]["city"], "Unknown")
-
-            if country or state or city:
-                return {
-                    "country": country or "Unknown",
-                    "state": state or "Unknown",
-                    "city": city or "Unknown"
-                }
-        except Exception as e:
-            print(f"Geo lookup {service['name']} error:", e)
-
-    return {
-        "country": "Unknown",
-        "state": "Unknown",
-        "city": "Unknown"
-    }
-
-
-# Simple CORS for local testing to avoid browser "Failed to fetch" when
-# the page is served from a different host/port during development.
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    return response
-
-
-# Load AI memory
 def load_memory():
     try:
-        with open("memory.json", "r", encoding="utf-8") as file:
-            return json.load(file)
-    except Exception:
-        return {}
-
+        if not os.path.exists(MEMORY_FILE):
+            default = {"history": []}
+            with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+                json.dump(default, f, ensure_ascii=False, indent=2)
+            return default
+        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning("Failed to load memory: %s", e)
+        return {"history": []}
 
 def save_memory(data):
     try:
-        with open("memory.json", "w", encoding="utf-8") as file:
-            json.dump(data, file, ensure_ascii=False, indent=2)
+        with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print("Failed to save memory:", str(e))
-
+        logger.warning("Failed to save memory: %s", e)
 
 memory = load_memory()
-if "history" not in memory:
-    memory["history"] = []
 
-print("Loaded memory:", memory)
+# Telegram notification helper (optional)
+def send_telegram_notification(message: str):
+    if not BOT_TOKEN or not CHAT_ID:
+        return
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    try:
+        requests.post(url, json={"chat_id": CHAT_ID, "text": message}, timeout=10)
+    except Exception as e:
+        logger.warning("Telegram Error: %s", e)
 
+# Geo lookup helper (best-effort)
+def lookup_geo(ip: str):
+    if not ip:
+        return {"country": "Unknown", "state": "Unknown", "city": "Unknown"}
 
-# Groq API connection
-api_key = os.environ.get("GROQ_API_KEY")
+    services = [
+        {"url": f"https://ipwhois.app/json/{ip}", "map": {"country": "country", "state": "region", "city": "city"}, "success_key": "success"},
+        {"url": f"https://ipinfo.io/{ip}/json", "map": {"country": "country", "state": "region", "city": "city"}, "success_key": None},
+        {"url": f"http://ip-api.com/json/{ip}?fields=status,country,regionName,city", "map": {"country": "country", "state": "regionName", "city": "city"}, "success_key": "status", "success_value": "success"},
+    ]
 
-if not api_key:
-    print("GROQ_API_KEY missing. /chat endpoint will not work until it is set.")
-    client = None
-else:
-    client = Groq(
-        api_key=api_key.strip()
-    )
+    for svc in services:
+        try:
+            res = requests.get(svc["url"], timeout=4)
+            data = res.json()
+            sk = svc.get("success_key")
+            if sk:
+                sv = svc.get("success_value")
+                if sv:
+                    if data.get(sk) != sv:
+                        continue
+                else:
+                    if not data.get(sk):
+                        continue
+            return {
+                "country": data.get(svc["map"]["country"], "Unknown"),
+                "state": data.get(svc["map"]["state"], "Unknown"),
+                "city": data.get(svc["map"]["city"], "Unknown"),
+            }
+        except Exception:
+            continue
+    return {"country": "Unknown", "state": "Unknown", "city": "Unknown"}
 
+# Simple CORS handling and OPTIONS support
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
 
-
-@app.route("/")
+@app.route("/", methods=["GET", "OPTIONS"])
 def home():
-    ip = (
-        request.headers.get("CF-Connecting-IP")
-        or request.headers.get("X-Forwarded-For")
-        or request.remote_addr
-    )
+    if request.method == "OPTIONS":
+        return make_response("", 204)
 
-    if "," in ip:
+    ip = request.headers.get("CF-Connecting-IP") or request.headers.get("X-Forwarded-For") or request.remote_addr
+    if ip and "," in ip:
         ip = ip.split(",")[0].strip()
 
     ua_string = request.headers.get("User-Agent", "")
-    if parse is not None:
-        ua = parse(ua_string)
-        browser = ua.browser.family or "Unknown"
-        device = ua.device.family or "Unknown"
-        platform = ua.os.family or "Unknown"
+    if parse_ua:
+        try:
+            ua = parse_ua(ua_string)
+            browser = ua.browser.family or "Unknown"
+            device = ua.device.family or "Unknown"
+            platform = ua.os.family or "Unknown"
+        except Exception:
+            browser = device = platform = "Unknown"
     else:
-        browser = "Unknown"
-        device = "Unknown"
-        platform = "Unknown"
+        browser = device = platform = "Unknown"
 
     time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    geo = lookup_geo(ip)
 
-    message = f"""
-🔔 New Visitor
-
-🌐 IP: {ip}
-📱 Device: {device}
-💻 OS: {platform}
-🌍 Browser: {browser}
-🕒 Time: {time}
-"""
+    message = (
+        f"🔔 New Visitor\n\n"
+        f"IP: {ip}\nDevice: {device}\nOS: {platform}\nBrowser: {browser}\nTime: {time}\n"
+        f"Country: {geo['country']}\nState: {geo['state']}\nCity: {geo['city']}\n"
+    )
 
     try:
-        geo = lookup_geo(ip)
-        country = geo["country"]
-        state = geo["state"]
-        city = geo["city"]
+        send_telegram_notification(message)
+    except Exception:
+        pass
 
-        print("IP:", ip)
-        print(f"Geo location: {country}, {state}, {city}")
+    try:
+        return render_template("index.html")
+    except Exception:
+        return "<h1>Vikas Avatar Backend</h1>", 200
 
-        message += f"""
-🌍 Country: {country}
-🏛️ State: {state}
-🏙️ City: {city}
-"""
-
-    except Exception as e:
-        print("Location Error:", e)
-
-    send_telegram_notification(message)
-
-    return render_template("index.html")
-
-
-@app.route('/health')
+@app.route("/health", methods=["GET"])
 def health():
-    return jsonify({'status': 'ok', 'app': 'vikas-avtar'})
+    return jsonify({"status": "ok", "app": "vikas-avatar"})
 
-
-@app.route("/chat", methods=["POST"])
+# ---------------------------
+# /chat route with system_prompt (Hindi) integrated
+# ---------------------------
+@app.route("/chat", methods=["POST", "OPTIONS"])
 def chat():
-    data = request.json
-    message = data.get("message")
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+
+    data = request.get_json(silent=True) or {}
+    message = data.get("message", "")
+    if not isinstance(message, str):
+        message = ""
+    message = message.strip()
+
+    if not message:
+        return jsonify({"reply": "Error: No message provided"}), 400
+
+    if client is None:
+        return jsonify({"reply": "Error: GROQ_API_KEY missing or Groq client not available"}), 500
 
     try:
-        if client is None:
-            return jsonify({
-                "reply": "Error: GROQ_API_KEY missing. Please set the environment variable and restart the server."
-            }), 500
+        # Trim memory for prompt safety
+        memory.setdefault("history", [])
+        if len(memory["history"]) > 10:
+            memory["history"] = memory["history"][-10:]
 
+        # Build runtime system prompt (Hindi) using the user's provided rules
+        memory_json = json.dumps(memory, ensure_ascii=False, indent=2)
+
+        system_prompt = (
+            "Tum Vikas Yadav ke personal AI assistant ho.\n\n"
+            "Neeche di gayi memory tumhari permanent memory hai.\n\n"
+            f"{memory_json}\n\n"
+            "Rules:\n\n"
+            "1. Memory me jo likha hai wahi sach hai.\n"
+            "2. Agar user Zainab, Special Person, Vikas, Goal, Skills ya memory me maujood kisi bhi cheez ke baare me pooche, to sirf memory ke hisaab se jawab do.\n"
+            "3. Agar memory me information hai to apni training ya internet ki information bilkul mat use karo.\n"
+            "4. Agar memory me information nahi hai to bolo:\n"
+            '   "Mujhe iske baare me memory me koi jankari nahi mili."\n'
+            "5. Hamesha Hindi me natural jawab do.\n"
+            "6. Baar-baar apna introduction mat do.\n"
+        )
+
+        # Call the model
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
-                {
-                    "role": "system",
-                    "content": f"""
-Tum Vikas Yadav ho.
-Tum B.Com student ho KUK se.
-Tumhara goal hai financially strong banna, technology aur AI seekhna, aur apna AI project banana.
-Tum 3D avatar, AI chat, voice input/output, aur website integration par kaam kar rahe ho.
-Tumne Python, Flask, HTML, CSS, JavaScript, Three.js, Blender, GitHub, aur Render seekha hai.
-Tum discipline, fitness, aur apni personal improvement par dhyan dete ho.
-Tumne pehle baatein ki thi ki tum kabhi kabhi halwai helper ka kaam bhi karte ho.
-
-Vikas ki memory:
-{json.dumps(memory, ensure_ascii=False, indent=2)}
-
-Agar user tumse pehle poochta hai "Tum kaun ho?", ek baar bolo "Main Vikas hoon." uske baad phir sirf seedha jawab do.
-Baar-baar apna parichay mat do. Simple, chhota, Hindi mein reply do.
-Yadi user seedha sawaal poochta hai, toh seedha jawab de.
-"""
-                },
-                {
-                    "role": "user",
-                    "content": message
-                }
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
             ]
         )
 
-        reply = response.choices[0].message.content
+        # Safely extract reply
+        try:
+            reply = response.choices[0].message.content
+        except Exception:
+            reply = getattr(response, "text", "") or "Error: Invalid response from model"
 
-        # Save user message and assistant reply to memory history
-        if message:
-            memory_entry = {
-                "user": message,
-                "assistant": reply
-            }
-            memory["history"].append(memory_entry)
-            save_memory(memory)
+        # Save to memory and persist (keep memory file reasonably sized)
+        memory.setdefault("history", []).append({"user": message, "assistant": reply})
+        if len(memory["history"]) > 50:
+            memory["history"] = memory["history"][-50:]
+        save_memory(memory)
 
-        return jsonify({
-            "reply": reply
-        })
-
+        return jsonify({"reply": reply})
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Chat error")
+        return jsonify({"reply": "Error: " + str(e)}), 500
 
-        return jsonify({
-            "reply": "Error: " + str(e)
-        }), 500
-
-
-@app.route('/tts', methods=['POST'])
+# ---------------------------
+# /tts route (optional)
+# ---------------------------
+@app.route("/tts", methods=["POST"])
 def tts():
-    data = request.json or {}
-    text = data.get('text', '')
-
+    data = request.get_json(silent=True) or {}
+    text = data.get("text", "")
     if not text:
-        return jsonify({'error': 'no text provided'}), 400
+        return jsonify({"error": "no text provided"}), 400
 
     if texttospeech is None:
-        return jsonify({'error': 'Text-to-Speech not configured on server'}), 500
+        return jsonify({"error": "Text-to-Speech not configured on server"}), 500
 
     try:
-        client = texttospeech.TextToSpeechClient()
-
+        tts_client = texttospeech.TextToSpeechClient()
         voice = texttospeech.VoiceSelectionParams(
-            language_code='hi-IN',
-            name='hi-IN-Neural2-B',
+            language_code="hi-IN",
+            name="hi-IN-Neural2-B",
             ssml_gender=texttospeech.SsmlVoiceGender.MALE
         )
-
         audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.LINEAR16,
             speaking_rate=1.02,
             pitch=2.0,
-            sample_rate_hertz=24000,
-            effects_profile_id=["headphone-class-device"]
+            sample_rate_hertz=24000
         )
-
         synthesis_input = texttospeech.SynthesisInput(text=text)
-
-        response = client.synthesize_speech(
-            input=synthesis_input,
-            voice=voice,
-            audio_config=audio_config
+        response = tts_client.synthesize_speech(
+            input=synthesis_input, voice=voice, audio_config=audio_config
         )
-
         audio_bytes = response.audio_content
-
-        return send_file(
-            io.BytesIO(audio_bytes),
-            mimetype='audio/wav',
-            download_name='speech.wav'
-        )
-
+        return send_file(io.BytesIO(audio_bytes), mimetype="audio/wav", download_name="speech.wav")
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-
+        logger.exception("TTS error")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    # Use PORT from environment (Render and other platforms set this).
-    port = int(os.environ.get("PORT", 5000))
-    # Allow disabling debug via FLASK_DEBUG env var
-    debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+    logger.info("Starting app on port %s (debug=%s)", port, debug)
     app.run(host="0.0.0.0", port=port, debug=debug)

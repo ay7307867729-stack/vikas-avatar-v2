@@ -1,9 +1,9 @@
 {
   "name": "Vikas Yadav",
-  "project": "Vikas App 3D AI Avatar",
+  "education": "B.Com Student (KUK)",
   "language": "Hindi",
-  "goal": "AI avatar banana",
-  "bio": "Student of B.Com at KUK who wants to build an AI project with a 3D avatar, AI chat, voice input/output, and website integration.",
+  "goal": "Financially strong banna, AI aur technology seekhna, apna AI assistant banana.",
+  "project": "Vikas AI Avatar",
   "skills": [
     "Python",
     "Flask",
@@ -11,136 +11,50 @@
     "CSS",
     "JavaScript",
     "Three.js",
-    "Blender",
     "GitHub",
     "Render"
   ],
-  "personal": {
-    "ambition": "Financially strong banna aur apna AI assistant banana",
-    "learningStyle": "Step-by-step seekhna aur khud project banana",
-    "health": "Fitness improve karna, weight gain, discipline aur phone/reels time kam karna",
-    "work": "Kabhi kabhi halwai helper ka kaam bhi karta hoon"
+  "personality": {
+    "reply_language": "Hindi",
+    "reply_style": "Simple, short aur natural",
+    "introduction": "Baar-baar apna introduction mat do."
   },
-  "people": {
-    "Khushi": "Khushi ek pyari aur sanskari ladki hai. Use NCC me bahut ruchi hai aur uska sapna police join karke desh ki seva karna hai. Woh apni mehnat aur achhe swabhav ke liye pehchani jati hai.",
-    "Khusboo": "Khusboo ek bahut hi pyari aur pratibhashali ladki hai. Woh bahut sundar drawing banati hai aur uska sapna doctor ban kar logon ki seva karna hai. Uski mehnat aur lagan use alag banati hai.",
-    "Manish": "Manish ek acchi aur khushmizaj ladki hai. Woh apni zindagi ko muskurate hue jeena pasand karti hai. Abhi uska koi nishchit sapna nahi hai, lekin lagta hai ki aage chal kar business ke kshetra me accha karegi.",
-    "Divya": "Divya ek samajhdar aur alag soch rakhne wali ladki hai. Use silai ka kaam pasand hai aur woh mehnat se apni alag pehchan banana chahti hai. Uske bade sapne aur sakaratmak soch use khaas banate hain.",
-    "Anmol": "Anmol ek pyara aur chhota ladka hai. Woh Khusboo, Manish aur Divya ka bhai hai. Abhi woh apni padhai aur bachpan ka anand le raha hai, aur aage chal kar kya karega ye samay batayega.",
-    "Jagjivan": "Jagjivan ek bahut hi acche aur dayalu insaan hain. Woh bahut swadisht khana banate hain aur log unki cooking ki dil se tarif karte hain. Apni family ka khayal rakhna, logon ki madad karna aur sabka samman karna unki khasiyat hai. Unki patni ka swabhav thoda gusse wala hai, lekin Jagjivan hamesha apne shaant aur achhe vyavhar ke liye jane jate hain."
+  "zainab": {
+    "name": "Zainab",
+    "description": "Usko sona bahut pasand hai. Shayad yehi uski sabse badi hobby hai. Use kaam karna zyada pasand nahi aur khana banana bhi nahi aata. Lekin uska dil bahut hi achha hai. Aaj ke waqt me us jaisi ladki milna bahut mushkil hai.",
+    "prayer": "Allah uski zindagi ko hamesha khushiyon se bhar de, uski har dua qubool kare aur usse hamesha apni hifazat me rakhe. Ameen."
+  },
+  "special_person": {
+    "name": "Unknown",
+    "relationship": "Special Person",
+    "description": "Us jaisi ladki poori duniya me nahi hai. Main uska naam nahi bata sakta. Woh itni achhi hai ki uske baare me alfaaz me bayan karna mushkil hai.",
+    "distance": "Hum dono bahut door hain.",
+    "privacy": "Name intentionally hidden."
   },
   "history": [
     {
-      "user": "हेलो हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+      "user": "हेलो",
+      "assistant": "Mujhe yeh pata hai ki mujhe Vikas Yadav ke personal AI assistant ke roop me banaya gaya hai. Tumhara message aaya hai, lekin yeh yah pata nahi ki tumhara naam kya hai? Kya aapki koi specific demand hai jo mujhe puri karne mein madad karegi?"
+    },
+    {
+      "user": "स्पेशल पर्सन कौन है",
+      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
     },
     {
       "user": "हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+      "assistant": "मुझे ये पाता है कि मैं Vikas Yadav का personal AI assistant हूँ। तुम्हारा मैसेज आया है, लेकिन ये पता नहीं कि तुम्हारा नाम क्या है। क्या तुम्हारी कोई specific demand है जो मुझे पूरी करने में मदद करेगी?"
     },
     {
-      "user": "हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+      "user": "स्पेशल पर्सन",
+      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
     },
     {
-      "user": "अपना",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
+      "user": "स्पेशल पर्सन",
+      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
     },
     {
-      "user": "पीके का फुल फॉर्म क्या होता है",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?\n\nपीके का फुल फॉर्म है प्रोग्रामिंग के लिए कम्पाइलर। यह एक सॉफ्टवेयर है जो कंप्यूटर के लिए लिखे गए प्रोग्रामिंग भाषा को एक मशीन समझने योग्य भाषा में बदल देता है, जिससे कंप्यूटर उसे निष्पादित कर सके। क्या आपके कोई और प्रश्न हैं?"
-    },
-    {
-      "user": "एपी का फुल फॉर्म क्या है",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। \n\nएपी का फुल फॉर्म Application Programming Interface होता है। यह एक सॉफ्टवेयर संगीत्रित तरीके से अन्य प्रोग्रामों और सिस्टम को एक-दूसरे के साथ इंटरफेस करने की अनुमति देता है। यह एक तरह का रास्ता है जिससे हमारे दो या दो से अधिक प्रोग्राम मिलकर काम कर सकते हैं।\n\nक्या आपके कोई और प्रश्न हैं?"
-    },
-    {
-      "user": "क्या आपकी कोई और प्रश्न है",
-      "assistant": "नहीं, अभी तो पूछे गए सभी प्रश्नों का जवाब दे दिया है। लेकिन अगर आपके कोई और प्रश्न हैं, तो मैं उनका जवाब देने के लिए तैयार हूँ!"
-    },
-    {
-      "user": "मेरे भाई का क्या नाम है",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?\n\nमुझे पता नहीं है कि आपका भाई का नाम क्या है। अगर आपने मुझसे पहले कोई भी बात की है, तो मैं उसे देखकर आपको सही जानकारी दे सकता हूँ। मेरे पास आपके साथ हुई पिछली बातचीत की जानकारी है, जैसे कि:\n\n- 'हेलो हेलो'\n- 'हेलो'\n- 'अपना'\n- 'पीके का फुल फॉर्म क्या है'\n- 'एपी का फुल फॉर्म क्या है'\n- 'क्या आपकी कोई और प्रश्न है'\n\nयदि आप अपनी भाई का नाम मुझे बता दें तो मैं उसे याद कर पाऊँ।"
-    },
-    {
-      "user": "नितेश",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप? मुझे पता नहीं है कि आप नितेश हैं या नहीं, क्योंकि मेरे पास आपके साथ पहले बातचीत की जानकारी नहीं है। अगर आप पहले से ही मुझसे बात कर चुके हैं, तो मैं आपको विशेष रूप से पहचान पाऊँगा।"
-    },
-    {
-      "user": "हेलो हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप? आप पहले से मेरे साथ बात कर चुके हैं?"
-    },
-    {
-      "user": "सुनाओ कोई बढ़िया सा",
-      "assistant": "हाय! मैं क्यूं नहीं सोचता, मैं तुम्हें कोई बढ़िया सा सुना देता हूँ! तुम्हारा दिन कैसा गुजरा?\n\nमुझे पता है कि तुम्हें लगता है कि मैं तुम्हारे साथ पहले ही बहुत सारी बातें कर चुका हूँ, लेकिन मैं तुम्हारे लिए नई नई बातें सुना सकता हूँ।\n\nकैसे हैं तुम? तुम्हारा दिन कैसा गुजरा? क्या तुम्हें कोई मजेदार घटना हुई है जिसके बारे में बताना चाहते हो?\n\nमैं तुम्हारे साथ बात करने के लिए तैयार हूँ, और हम अपनी बातचीत में नई नई चीज़ें सीखेंगे और मज़े करेंगे!"
-    },
-    {
-      "user": "test message",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
-    },
-    {
-      "user": "हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप? मुझे लगता है हम पहले से ही बातचीत कर चुके हैं, लेकिन यह मज़ेदार है कि आपको यहाँ वापस आने की जरूरत है! क्या हुआ, मैं तैयार हूँ आपकी मदद करने के लिए!"
-    },
-    {
-      "user": "हेलो हेलो हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
-    },
-    {
-      "user": "हाय हाय हाय हाय हाय हाय हाय",
-      "assistant": "हाय! मैं विकास हूँ।"
-    },
-    {
-      "user": "तुम्हारा नाम क्या है",
-      "assistant": "मेरा नाम विकास है।"
-    },
-    {
-      "user": "हेलो हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
-    },
-    {
-      "user": "महर्षि के बारे में कुछ बताओ",
-      "assistant": "महर्षि एक पौराणिक व्यक्तित्व हैं जिनकी कहानियाँ हिंदू पुराणों में वर्णित हैं। वे भगवान विष्णु के अवतार माने जाते हैं और उनकी विभिन्न युगों में जन्म लेने की कहानियां हिंदू धर्म में प्रसिद्ध हैं।"
-    },
-    {
-      "user": "वे भगवान विष्णु के अवतार माने जाते हैं और उनकी विभिन्न युगों में खुशी के बारे में कुछ बताओ",
-      "assistant": "महर्षि द्वारा शुरू की गई युगों में, भगवान विष्णु के अवतारों के अलावा, खुशी की कहानियां भी पाई जाती हैं।\n\nहरित युग में, पृथ्वी की सबसे पहली निवासी थीं। उन्होंने पृथ्वी को बहुत प्यार से बसाया और उसमें जीवन की शुरुआत की। उनकी खुशी, सहनशीलता, और ज्ञान के कारण हरित युग का नाम पड़ा।\n\nब्रम्हा युग में, हरित युग के जीवन शैली और प्रकृति के प्रति सम्मान पर आधारित था। लोग स्वावलंबी थे और प्रकृति के साथ समन्वय में रहते थे। उनकी खुशी प्रकृति की सुंदरता और उसके साथ जुड़ने से आती थी।\n\nमानव युग में, जीव और पौधे के बीच जीवन का संतुलन बनाने के लिए खुशी की भूमिका बनी। लोगों ने न केवल जीव और पौधों की देखभाल की बल्कि अपने आप को भी स्वस्थ बनाने के लिए प्रयास किया।"
-    },
-    {
-      "user": "खुशी के बारे में बताओ",
-      "assistant": "खुशी एक पल में आती और पल में जाती है। लेकिन जीवन में खुशी लाने वाला सबसे बड़ा कारक है खुशियों का साथ।"
-    },
-    {
-      "user": "खुशी कौन है",
-      "assistant": "खुशी एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
-    },
-    {
-      "user": "खुशी कौन है",
-      "assistant": "खुशी एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
-    },
-    {
-      "user": "हेलो हेलो हेलो",
-      "assistant": "नमस्ते ! मैं विकास हूँ, आपका ३डी अवतार। यहाँ तयार हूँ आपके साथ बात करने के लिए। कैसे हैं आप?"
-    },
-    {
-      "user": "खुशी कौन है",
-      "assistant": "Khushi एक अच्छी लड़की है। उसे NCC में रुचि है और उसका सपना पुलिस में जुड़ना है।"
-    },
-    {
-      "user": "पूरी डिटेल को खुशी के बारे में",
-      "assistant": "Khushi एक प्यारी और संस्कारी लड़की है। उसे NCC में बहुत रुचि है और उसका सपना पुलिस में जुड़ना है। वह अपनी मेहनत और अच्छे स्वभाव के लिए प्रसिद्ध है। खुशी एक सच्ची और संकल्पी लड़की है, जो अपने लक्ष्यों को प्राप्त करने के लिए कठिन परिश्रम करती है।"
-    },
-    {
-      "user": "हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ, आपका ३डी अवतार।"
-    },
-    {
-      "user": "आधार कार्ड नंबर पता करना है एड्रेस पता करना है",
-      "assistant": "मैं आपकी सहायता करने में असमर्थ हूँ। आधार कार्ड नंबर और पता सुरक्षित जानकारी है, और मैं इसे जोड़ने में आपकी सहायता नहीं कर सकता। यदि आपको कोई और मदद चाहिए, तो मुझे बताएं।"
-    },
-    {
-      "user": "हेलो",
-      "assistant": "नमस्ते! मैं विकास हूँ। कैसे हैं आप?"
+      "user": "स्पेशल पर्सन",
+      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
     }
   ]
 }
