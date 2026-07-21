@@ -1,10 +1,88 @@
 const talkBtn = document.getElementById("talkBtn");
+const chatBtn = document.getElementById("chatBtn");
+const chatOverlay = document.getElementById("chatOverlay");
+const closeChatBtn = document.getElementById("closeChatBtn");
+const chatForm = document.getElementById("chatForm");
+const chatInput = document.getElementById("chatInput");
+const chatMessages = document.getElementById("chatMessages");
+const chatSendBtn = document.getElementById("chatSendBtn");
+
+function setChatOpen(isOpen) {
+    chatOverlay.classList.toggle("open", isOpen);
+    chatOverlay.setAttribute("aria-hidden", String(!isOpen));
+    document.querySelector(".avatar-box").classList.toggle("chat-hidden", isOpen);
+    if (isOpen) setTimeout(() => chatInput.focus(), 250);
+}
+
+chatBtn.addEventListener("click", () => setChatOpen(true));
+closeChatBtn.addEventListener("click", () => setChatOpen(false));
+chatOverlay.addEventListener("click", (event) => {
+    if (event.target === chatOverlay) setChatOpen(false);
+});
+
+function addChatMessage(text, type) {
+    const message = document.createElement("div");
+    message.className = `message ${type}-message`;
+    message.textContent = text;
+    chatMessages.appendChild(message);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return message;
+}
+
+chatForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const text = chatInput.value.trim();
+    if (!text || chatSendBtn.disabled) return;
+
+    addChatMessage(text, "user");
+    chatInput.value = "";
+    chatSendBtn.disabled = true;
+    const typing = addChatMessage("Anaya is typing... ✨", "ai");
+    typing.classList.add("typing");
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.reply || "Chat request failed");
+        typing.remove();
+        addChatMessage(data.reply || "Mujhe koi reply nahi mila.", "ai");
+        document.getElementById("response").textContent = data.reply || "";
+        const songName = extractSongName(text);
+        if (songName) playSong(songName);
+    } catch (error) {
+        typing.remove();
+        addChatMessage(error.message || "Abhi chat service available nahi hai.", "ai");
+    } finally {
+        chatSendBtn.disabled = false;
+        chatInput.focus();
+    }
+});
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
-const recognition = new SpeechRecognition();
+// Speech recognition is not available in every browser (Firefox and many
+// mobile browsers do not expose it). Keep the rest of the UI usable there.
+const recognition = SpeechRecognition ? new SpeechRecognition() : {
+    start() {
+        throw new Error("Speech recognition is not supported by this browser.");
+    }
+};
+recognition.onstart = () => {
+    console.log("MIC STARTED");
+};
 
+recognition.onerror = (event) => {
+    console.log("MIC ERROR:", event.error);
+};
+
+recognition.onend = () => {
+    console.log("MIC STOPPED");
+};
 recognition.lang = "hi-IN";
 recognition.interimResults = false;
 
@@ -12,28 +90,38 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("response").textContent = "";
 });
 
+let isListening = false;
+
 talkBtn.addEventListener("click", () => {
 
+    if (!SpeechRecognition) {
+        alert("Voice input is not supported in this browser. Please use Chrome or Edge.");
+        return;
+    }
+
+    if(isListening){
+        console.log("Already listening");
+        return;
+    }
+
     recognition.start();
+    isListening = true;
 
     talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Listening...`;
 
 });
-window.addEventListener("load", () => {
 
-    setTimeout(() => {
 
-        recognition.start();
+recognition.onend = () => {
+    isListening = false;
+    talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+};
 
-        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Listening...`;
-
-    }, 1500);
-
-});
 
 recognition.onresult = async (event) => {
 
     const text = event.results[0][0].transcript;
+    const lowerText = text.toLowerCase();
 
     talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Thinking...`;
     triggerTalkAnimation();
@@ -57,12 +145,19 @@ recognition.onresult = async (event) => {
 
         const data = await response.json();
         const responseParagraph = document.getElementById("response");
-        responseParagraph.textContent = "";
+        if (!response.ok) {
+            throw new Error(data.reply || "Chat request failed");
+        }
+        responseParagraph.textContent = data.reply || "No reply received.";
 
         // Use browser TTS with a normal female voice.
-        await speak(data.reply);
+        await speak(data.reply || "No reply received.");
+        // Agar user ne song play karne ko bola hai
 
-        responseParagraph.textContent = "";
+
+        const songName = extractSongName(text);
+        if (songName) playSong(songName);
+
     } finally {
         stopTalkAnimation();
         talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
@@ -179,6 +274,38 @@ recognition.onerror = () => {
     alert("Mic Error");
 
 };
+function extractSongName(text) {
+    const lower = text.toLowerCase();
+    const intent = /\b(play|song|music|gaana|gana|bajao|chalao|sunao|suna[oao]?)\b/i;
+    if (!intent.test(lower)) return "";
+    return text
+        .replace(/\b(please|play|song|music|gaana|gana|bajao|chalao|sunao|suna[oao]?)\b/gi, "")
+        .replace(/^(ko|koi|mujhe|mera|meri|par|on)\s+/i, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+async function playSong(songName) {
+    const status = document.getElementById("songStatus");
+    const player = document.getElementById("ytplayer");
+    songName = (songName || "").trim();
+    if (!songName) {
+        status.textContent = "Song ka naam batao.";
+        return;
+    }
+    status.textContent = `YouTube par “${songName}” dhoondh raha hoon...`;
+    try {
+        const response = await fetch(`/youtube_search?q=${encodeURIComponent(songName)}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Song nahi mila");
+        player.src = `https://www.youtube.com/embed/${data.videoId}?autoplay=1&playsinline=1&rel=0`;
+        status.textContent = `▶ ${data.title}`;
+    } catch (error) {
+        console.error("YouTube playback error:", error);
+        status.textContent = error.message || "Song play nahi ho paya.";
+    }
+}
+
 
 // ===== 3D Avatar Scene =====
 
@@ -492,3 +619,14 @@ function animate() {
 }
 
 animate();
+const songBtn = document.getElementById("songBtn");
+
+songBtn.onclick = () => {
+
+    let songName = prompt("Kaunsa song chalana hai?");
+
+    if(songName){
+        playSong(songName);
+    }
+
+};

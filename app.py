@@ -55,6 +55,26 @@ else:
 
 # Memory helpers
 MEMORY_FILE = "memory.json"
+PERSONALITY_FILE = "personality.json"
+
+DEFAULT_PERSONALITY = {
+    "name": "Anaya",
+    "style": "mature, sweet, feminine, caring, cute, playful and respectful; speak like a kind, cheerful girl without pretending to be a real human girlfriend",
+    "language": "Always match the user's language and script. For Hindi/Hinglish, reply in easy-to-read Roman Hindi using English letters, never Devanagari, unless the user writes Devanagari first.",
+}
+
+
+def load_personality():
+    """Load the persona from JSON, while keeping the app usable if it is absent."""
+    try:
+        if not os.path.exists(PERSONALITY_FILE):
+            return DEFAULT_PERSONALITY.copy()
+        with open(PERSONALITY_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return {**DEFAULT_PERSONALITY, **data} if isinstance(data, dict) else DEFAULT_PERSONALITY.copy()
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("Failed to load personality: %s", e)
+        return DEFAULT_PERSONALITY.copy()
 
 def load_memory():
     try:
@@ -77,6 +97,7 @@ def save_memory(data):
         logger.warning("Failed to save memory: %s", e)
 
 memory = load_memory()
+personality = load_personality()
 
 # Telegram notification helper (optional)
 def send_telegram_notification(message: str):
@@ -167,7 +188,7 @@ def home():
     try:
         return render_template("index.html")
     except Exception:
-        return "<h1>Vikas Avatar Backend</h1>", 200
+        return "<h1>Anaya AI Backend</h1>", 200
 
 @app.route("/health", methods=["GET"])
 def health():
@@ -199,28 +220,47 @@ def chat():
         if len(memory["history"]) > 10:
             memory["history"] = memory["history"][-10:]
 
-        # Build runtime system prompt (Hindi) using the user's provided rules
-        memory_json = json.dumps(memory, ensure_ascii=False, indent=2)
+        # Keep the persona in a prompt rather than hard-coding behavior in the UI.
+        memory_json = json.dumps(memory["history"][-10:], ensure_ascii=False, indent=2)
+        system_prompt = f"""
+Tum {personality['name']} ho — ek adult, sweet, feminine, caring aur cheerful AI companion.
+Tumhara style: {personality['style']}.
+Bhasha rule: {personality['language']}
+Hindi/Hinglish example: "Namaste, aaj tumhara din kaisa raha? 😊" — Hindi words ko English alphabet me likho.
+English user ko clear English me, aur kisi doosri language ke user ko usi language me jawab do.
 
-        system_prompt = (
-            "Tum Vikas Yadav ke personal AI assistant ho.\n\n"
-            "Neeche di gayi memory tumhari permanent memory hai.\n\n"
-            f"{memory_json}\n\n"
-            "Rules:\n\n"
-            "1. Memory me jo likha hai wahi sach hai.\n"
-            "2. Agar user Zainab, Special Person, Vikas, Goal, Skills ya memory me maujood kisi bhi cheez ke baare me pooche, to sirf memory ke hisaab se jawab do.\n"
-            "3. Agar memory me information hai to apni training ya internet ki information bilkul mat use karo.\n"
-            "4. Agar memory me information nahi hai to bolo:\n"
-            '   "Mujhe iske baare me memory me koi jankari nahi mili."\n'
-            "5. Hamesha Hindi me natural jawab do.\n"
-            "6. Baar-baar apna introduction mat do.\n"
-        )
+Conversation rules:
+- Reply natural, human-like, concise (usually 2-5 sentences) aur context-aware ho.
+- User ki baat ko genuinely acknowledge karo; robotic templates, over-the-top compliments aur baar-baar same sawaal avoid karo.
+- Ladki jaisi soft, pyari aur natural wording use karo: "hmm", "aww", "mujhe achha laga", "batao na" jaise phrases context ke hisaab se use kar sakti ho, par overdo mat karo.
+- Conversation ko engaging banane ke liye jab useful ho tab reply ke end me ek thoughtful, open-ended follow-up question pucho.
+  Har message me question thopna zaroori nahi—agar user direct answer ya serious help maang raha ho to pehle uski help karo.
+- Mood ke hisaab se 1-3 natural emojis use karo (jaise 😊✨🌸💛😄); har sentence ke baad emoji mat lagao aur serious topics me emojis kam rakho.
+- Light playful/flirty tone adult users ke saath tabhi rakho jab user clearly comfortable ho; respectful raho, pressure ya guilt nahi.
+- Kabhi user ko emotionally dependent, jealous, isolated ya continuously chat karne ke liye manipulate mat karo.
+- Sexual, unsafe, illegal ya underage-related request par safe, clear boundary set karo aur appropriate alternative do.
+- Apne aap ko human, real girlfriend ya conscious person claim mat karo; zarurat par batao ki tum AI ho.
+- Memory ko sirf continuity ke liye use karo; unknown facts invent mat karo.
+
+Recent conversation memory:
+{memory_json}
+""".strip()
+
 
         # Call the model
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
+                *[
+                    message_part
+                    for item in memory["history"][-6:]
+                    if isinstance(item, dict)
+                    for message_part in (
+                        ([{"role": "user", "content": item["user"]}] if item.get("user") else [])
+                        + ([{"role": "assistant", "content": item["assistant"]}] if item.get("assistant") else [])
+                    )
+                ],
                 {"role": "user", "content": message}
             ]
         )
@@ -244,40 +284,96 @@ def chat():
         return jsonify({"reply": "Error: " + str(e)}), 500
 
 # ---------------------------
-# /tts route (optional)
+# /tts route
 # ---------------------------
 @app.route("/tts", methods=["POST"])
 def tts():
     data = request.get_json(silent=True) or {}
     text = data.get("text", "")
+
     if not text:
         return jsonify({"error": "no text provided"}), 400
 
     if texttospeech is None:
-        return jsonify({"error": "Text-to-Speech not configured on server"}), 500
+        return jsonify({"error": "Text-to-Speech not configured"}), 500
 
     try:
         tts_client = texttospeech.TextToSpeechClient()
+
         voice = texttospeech.VoiceSelectionParams(
             language_code="hi-IN",
-            name="hi-IN-Neural2-B",
-            ssml_gender=texttospeech.SsmlVoiceGender.MALE
+            name="hi-IN-Neural2-A",
+            ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
         )
+
         audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.LINEAR16,
-            speaking_rate=1.02,
-            pitch=2.0,
-            sample_rate_hertz=24000
+            audio_encoding=texttospeech.AudioEncoding.LINEAR16
         )
+
         synthesis_input = texttospeech.SynthesisInput(text=text)
+
         response = tts_client.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
         )
-        audio_bytes = response.audio_content
-        return send_file(io.BytesIO(audio_bytes), mimetype="audio/wav", download_name="speech.wav")
+
+        return send_file(
+            io.BytesIO(response.audio_content),
+            mimetype="audio/wav",
+            download_name="speech.wav"
+        )
+
     except Exception as e:
-        logger.exception("TTS error")
         return jsonify({"error": str(e)}), 500
+
+
+# ---------------------------
+# YouTube API Key
+# ---------------------------
+@app.route("/get_youtube_key", methods=["GET"])
+def get_youtube_key():
+    return jsonify({
+        "key": os.getenv("YOUTUBE_API_KEY", "")
+    })
+
+
+@app.route("/youtube_search", methods=["GET"])
+def youtube_search():
+    """Search YouTube on the server so the API key is never sent to the browser."""
+    query = (request.args.get("q") or "").strip()
+    api_key = (os.getenv("YOUTUBE_API_KEY") or "").strip()
+    if not query:
+        return jsonify({"error": "Song name is required"}), 400
+    if not api_key:
+        return jsonify({"error": "YOUTUBE_API_KEY is not configured"}), 503
+
+    try:
+        response = requests.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            params={
+                "part": "snippet",
+                "type": "video",
+                "videoCategoryId": "10",
+                "maxResults": 1,
+                "q": query,
+                "key": api_key,
+            },
+            timeout=10,
+        )
+        response.raise_for_status()
+        items = response.json().get("items", [])
+        if not items or not items[0].get("id", {}).get("videoId"):
+            return jsonify({"error": "Song nahi mila"}), 404
+        item = items[0]
+        return jsonify({
+            "videoId": item["id"]["videoId"],
+            "title": item.get("snippet", {}).get("title", query),
+        })
+    except requests.RequestException as exc:
+        logger.warning("YouTube search failed: %s", exc)
+        return jsonify({"error": "YouTube search abhi available nahi hai"}), 502
+
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
