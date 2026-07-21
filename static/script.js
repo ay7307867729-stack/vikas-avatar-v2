@@ -6,6 +6,128 @@ const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const chatSendBtn = document.getElementById("chatSendBtn");
+const screenWatchBtn = document.getElementById("screenWatchBtn");
+const screenStopBtn = document.getElementById("screenStopBtn");
+const screenStatus = document.getElementById("screenStatus");
+
+let screenStream = null;
+let screenVideo = null;
+let screenWatchTimer = null;
+let screenAnalysisBusy = false;
+let lastScreenReply = "";
+let visionControlsVoice = false;
+
+function setScreenStatus(text) {
+    if (screenStatus) screenStatus.textContent = text;
+}
+
+function stopScreenWatching() {
+    if (screenWatchTimer) {
+        clearInterval(screenWatchTimer);
+        screenWatchTimer = null;
+    }
+    if (screenStream) screenStream.getTracks().forEach((track) => track.stop());
+    screenStream = null;
+    if (screenVideo) {
+        screenVideo.srcObject = null;
+        screenVideo.remove();
+        screenVideo = null;
+    }
+    screenAnalysisBusy = false;
+    if (screenWatchBtn) screenWatchBtn.hidden = false;
+    if (screenStopBtn) screenStopBtn.hidden = true;
+    setScreenStatus("Screen sharing is off.");
+    if (visionControlsVoice) stopVisionVoiceSession();
+}
+
+function stopVisionVoiceSession() {
+    visionControlsVoice = false;
+    voiceSessionActive = false;
+    if (silenceTimer) clearTimeout(silenceTimer);
+    silenceTimer = null;
+    try { recognition.stop(); } catch (_) {}
+    window.speechSynthesis.cancel();
+    talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+    talkBtn.classList.remove("voice-active");
+}
+
+async function analyzeScreenFrame(question = "") {
+    if (!screenVideo || !screenStream || screenAnalysisBusy || screenVideo.readyState < 2) return;
+    screenAnalysisBusy = true;
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 960 / (screenVideo.videoWidth || 960));
+    canvas.width = Math.max(1, Math.round((screenVideo.videoWidth || 960) * scale));
+    canvas.height = Math.max(1, Math.round((screenVideo.videoHeight || 540) * scale));
+    canvas.getContext("2d").drawImage(screenVideo, 0, 0, canvas.width, canvas.height);
+    setScreenStatus("Screen dekh rahi hoon…");
+
+    try {
+        const response = await fetch("/screen_analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                image: canvas.toDataURL("image/jpeg", 0.55),
+                prompt: question || "Screen par abhi kya visible hai, aur pichhle frame se koi important change ho to short Roman Hindi me batao. Passwords, tokens ya private text ko repeat mat karo."
+            })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Screen analysis failed");
+        const reply = (data.reply || "Screen par kuch clearly dikh nahi raha.").trim();
+        if (reply !== lastScreenReply) {
+            lastScreenReply = reply;
+            document.getElementById("response").textContent = reply;
+            addChatMessage(reply, "ai");
+            // Speak only changed observations so the watcher does not talk over itself.
+            try {
+                startChatAvatarReaction();
+                await speak(reply);
+            } catch (_) { /* speech is optional */ }
+            finally { stopChatAvatarReaction(); }
+        }
+        setScreenStatus("● Watching screen — last update abhi hua");
+    } catch (error) {
+        setScreenStatus(error.message || "Screen analysis available nahi hai.");
+    } finally {
+        screenAnalysisBusy = false;
+    }
+}
+
+async function startScreenWatching() {
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+        setScreenStatus("Is browser me screen sharing supported nahi hai.");
+        return;
+    }
+    try {
+        setScreenStatus("Permission maang rahi hoon…");
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 1, max: 2 } },
+            audio: false
+        });
+        screenVideo = document.createElement("video");
+        screenVideo.muted = true;
+        screenVideo.playsInline = true;
+        screenVideo.srcObject = screenStream;
+        await screenVideo.play();
+        screenStream.getVideoTracks()[0].addEventListener("ended", stopScreenWatching, { once: true });
+        screenWatchBtn.hidden = true;
+        screenStopBtn.hidden = false;
+        // Vision permission also enables hands-free voice questions. The mic
+        // remains active for as long as the display-capture permission lives.
+        visionControlsVoice = true;
+        voiceSessionActive = true;
+        startRecognitionLoop();
+        lastScreenReply = "";
+        await analyzeScreenFrame();
+        screenWatchTimer = setInterval(analyzeScreenFrame, 6000);
+    } catch (error) {
+        stopScreenWatching();
+        if (error.name === "NotAllowedError") setScreenStatus("Screen permission nahi mili. Jab chaho dobara Start dabao.");
+        else setScreenStatus(error.message || "Screen share start nahi ho saka.");
+    }
+}
+
+screenWatchBtn?.addEventListener("click", startScreenWatching);
+screenStopBtn?.addEventListener("click", stopScreenWatching);
 
 function setChatOpen(isOpen) {
     chatOverlay.classList.toggle("open", isOpen);
@@ -29,6 +151,22 @@ function addChatMessage(text, type) {
     return message;
 }
 
+function naturalReplyDelay(text) {
+    // A small, bounded pause makes chat feel conversational without being sluggish.
+    const lengthPause = Math.min(1100, Math.max(250, (text || "").length * 14));
+    return lengthPause + Math.floor(Math.random() * 260);
+}
+
+function startChatAvatarReaction() {
+    triggerTalkAnimation();
+    document.querySelector(".avatar-box")?.classList.add("chat-talking");
+}
+
+function stopChatAvatarReaction() {
+    stopTalkAnimation();
+    document.querySelector(".avatar-box")?.classList.remove("chat-talking");
+}
+
 chatForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = chatInput.value.trim();
@@ -37,8 +175,13 @@ chatForm.addEventListener("submit", async (event) => {
     addChatMessage(text, "user");
     chatInput.value = "";
     chatSendBtn.disabled = true;
+    // Start music independently from the AI request. This means a missing or
+    // slow Groq response cannot prevent a requested song from playing.
+    const requestedSong = extractSongName(text);
+    if (requestedSong) playSong(requestedSong);
     const typing = addChatMessage("Anaya is typing... ✨", "ai");
     typing.classList.add("typing");
+    startChatAvatarReaction();
 
     try {
         const response = await fetch("/chat", {
@@ -48,15 +191,15 @@ chatForm.addEventListener("submit", async (event) => {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.reply || "Chat request failed");
+        await new Promise((resolve) => setTimeout(resolve, naturalReplyDelay(data.reply)));
         typing.remove();
         addChatMessage(data.reply || "Mujhe koi reply nahi mila.", "ai");
         document.getElementById("response").textContent = data.reply || "";
-        const songName = extractSongName(text);
-        if (songName) playSong(songName);
     } catch (error) {
         typing.remove();
         addChatMessage(error.message || "Abhi chat service available nahi hai.", "ai");
     } finally {
+        stopChatAvatarReaction();
         chatSendBtn.disabled = false;
         chatInput.focus();
     }
@@ -91,6 +234,24 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 let isListening = false;
+let voiceSessionActive = false;
+let voiceRequestInFlight = false;
+let silenceTimer = null;
+const SILENCE_LIMIT_MS = 10000;
+
+function resetSilenceTimer() {
+    if (silenceTimer) clearTimeout(silenceTimer);
+    // Display capture is the explicit keep-alive permission for voice mode.
+    if (!voiceSessionActive || screenStream) return;
+    silenceTimer = setTimeout(() => {
+        voiceSessionActive = false;
+        silenceTimer = null;
+        try { recognition.stop(); } catch (_) {}
+        window.speechSynthesis.cancel();
+        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        talkBtn.classList.remove("voice-active");
+    }, SILENCE_LIMIT_MS);
+}
 
 talkBtn.addEventListener("click", () => {
 
@@ -99,34 +260,62 @@ talkBtn.addEventListener("click", () => {
         return;
     }
 
-    if(isListening){
-        console.log("Already listening");
+    if (voiceSessionActive) {
+        if (visionControlsVoice) return;
+        voiceSessionActive = false;
+        isListening = false;
+        try { recognition.stop(); } catch (_) {}
+        window.speechSynthesis.cancel();
+        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        talkBtn.classList.remove("voice-active");
         return;
     }
 
-    recognition.start();
-    isListening = true;
-
-    talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Listening...`;
+    voiceSessionActive = true;
+    startRecognitionLoop();
 
 });
 
+function startRecognitionLoop() {
+    if (!voiceSessionActive || isListening || voiceRequestInFlight) return;
+    try {
+        recognition.start();
+        isListening = true;
+        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Listening… (tap to stop)`;
+        talkBtn.classList.add("voice-active");
+    } catch (_) {}
+}
 
 recognition.onend = () => {
     isListening = false;
-    talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+    if (voiceSessionActive && !voiceRequestInFlight) setTimeout(startRecognitionLoop, 250);
+    if (!voiceSessionActive) {
+        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        talkBtn.classList.remove("voice-active");
+    }
 };
 
 
 recognition.onresult = async (event) => {
 
     const text = event.results[0][0].transcript;
-    const lowerText = text.toLowerCase();
+    resetSilenceTimer();
+    window.speechSynthesis.cancel();
+    const requestedSong = extractSongName(text);
+    // Voice commands should launch playback immediately, before chat/TTS.
+    if (requestedSong) playSong(requestedSong);
 
     talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Thinking...`;
     triggerTalkAnimation();
 
+    voiceRequestInFlight = true;
     try {
+        if (screenStream) {
+            // While Vision is active, answer the spoken question against the
+            // latest approved screen frame instead of a text-only chat call.
+            await analyzeScreenFrame(`User ka sawal: "${text}". Current shared screen ko dekhkar short Roman Hindi me seedha jawab do. Agar screen par jawab nahi milta, clearly bolo ki screen par nahi dikh raha. Private passwords, tokens aur sensitive text repeat mat karo.`);
+            return;
+        }
         // Gemini ko message bhejna
         const response = await fetch("/chat", {
 
@@ -148,19 +337,28 @@ recognition.onresult = async (event) => {
         if (!response.ok) {
             throw new Error(data.reply || "Chat request failed");
         }
-        responseParagraph.textContent = data.reply || "No reply received.";
+        const reply = (data.reply || "No reply received.")
+            .replace(/\s+/g, " ")
+            .split(/(?<=[.!?।])\s+/)
+            .slice(0, 2)
+            .join(" ");
+        responseParagraph.textContent = reply;
 
         // Use browser TTS with a normal female voice.
-        await speak(data.reply || "No reply received.");
+        await speak(reply);
         // Agar user ne song play karne ko bola hai
+        resetSilenceTimer();
 
-
-        const songName = extractSongName(text);
-        if (songName) playSong(songName);
 
     } finally {
+        voiceRequestInFlight = false;
         stopTalkAnimation();
-        talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        if (voiceSessionActive) {
+            talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Listening… (tap to stop)`;
+            setTimeout(startRecognitionLoop, 250);
+        } else {
+            talkBtn.innerHTML = `<i class="fas fa-microphone"></i> Talk`;
+        }
     }
 
 };
@@ -275,12 +473,21 @@ recognition.onerror = () => {
 
 };
 function extractSongName(text) {
-    const lower = text.toLowerCase();
-    const intent = /\b(play|song|music|gaana|gana|bajao|chalao|sunao|suna[oao]?)\b/i;
-    if (!intent.test(lower)) return "";
-    return text
-        .replace(/\b(please|play|song|music|gaana|gana|bajao|chalao|sunao|suna[oao]?)\b/gi, "")
-        .replace(/^(ko|koi|mujhe|mera|meri|par|on)\s+/i, "")
+    if (!text || typeof text !== "string") return "";
+
+    // Match both English and common Roman-Hindi voice phrases. Keep this
+    // client-side so playback can begin without waiting for /chat.
+    const command = text.trim().replace(/[.!?]+$/, "");
+    const requestPattern = /^(?:please\s+)?(?:play|listen(?:\s+to)?|put\s+on|start)\s+(?:the\s+)?(?:song\s+|music\s+)?(.+)$/iu;
+    const hindiPattern = /^(?:please\s+)?(?:mujhe\s+)?(?:koi\s+)?(?:song|gaana|gana|music|गाना|सॉन्ग|म्यूजिक)\s+(?:bajao|chalao|sunao|suna do|play karo|बजाओ|चलाओ|सुनाओ)\s*(.*)$/iu;
+    const reverseHindiPattern = /^(?:please\s+)?(.+?)\s+(?:song|gaana|gana|गाना|सॉन्ग)\s+(?:bajao|chalao|sunao|suna do|बजाओ|चलाओ|सुनाओ)$/iu;
+    const titleVerbPattern = /^(?:please\s+)?(.+?)\s+(?:bajao|chalao|sunao|suna do|play karo|बजाओ|चलाओ|सुनाओ)$/iu;
+
+    const match = command.match(requestPattern) || command.match(hindiPattern) || command.match(reverseHindiPattern) || command.match(titleVerbPattern);
+    if (!match) return "";
+
+    return (match[1] || "")
+        .replace(/^(?:ko|par|on|please)\s+/i, "")
         .replace(/\s+/g, " ")
         .trim();
 }
@@ -298,7 +505,8 @@ async function playSong(songName) {
         const response = await fetch(`/youtube_search?q=${encodeURIComponent(songName)}`);
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Song nahi mila");
-        player.src = `https://www.youtube.com/embed/${data.videoId}?autoplay=1&playsinline=1&rel=0`;
+        // Reassigning the iframe URL also stops the previous song cleanly.
+        player.src = `https://www.youtube.com/embed/${encodeURIComponent(data.videoId)}?autoplay=1&playsinline=1&rel=0`;
         status.textContent = `▶ ${data.title}`;
     } catch (error) {
         console.error("YouTube playback error:", error);

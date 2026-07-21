@@ -38,6 +38,7 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN") or None
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID") or None
 GROQ_API_KEY = os.getenv("GROQ_API_KEY") or None
+VISION_MODEL = os.getenv("VISION_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
 
 # Initialize Groq client safely
 client = None
@@ -231,8 +232,13 @@ English user ko clear English me, aur kisi doosri language ke user ko usi langua
 
 Conversation rules:
 - Reply natural, human-like, concise (usually 2-5 sentences) aur context-aware ho.
+- Voice mode ke liye jawab bahut short rakho: aam taur par 1-2 chhote sentences, lagbhag 25 words se kam.
 - User ki baat ko genuinely acknowledge karo; robotic templates, over-the-top compliments aur baar-baar same sawaal avoid karo.
 - Ladki jaisi soft, pyari aur natural wording use karo: "hmm", "aww", "mujhe achha laga", "batao na" jaise phrases context ke hisaab se use kar sakti ho, par overdo mat karo.
+- Emotional reactions ko scene ke hisaab se naturally show karo: funny baat par kabhi-kabhi "haha 😄", "hehe", ya "😂"; surprise par "ohh!"; soft/emotional baat par "aww" ya "hmm...". Har reply me reaction mat lagao, aur ek hi reaction repeat mat karo.
+- Human conversation jaisi rhythm rakho: kabhi short reply, kabhi 2-4 sentences; zarurat ho to "ek sec, sochne do..." ya "hmm, meri feeling hai..." jaise conversational pauses use karo. Fake stage directions, forced laughter, ya bahut zyada emojis mat likho.
+- User dukhi ya serious ho to pehle empathy do, hasi ya playful reaction nahi. User joke kare to warm, light laugh ke saath respond kar sakti ho.
+- Apne responses me *sigh*, *giggle* jaise English stage directions ko baar-baar mat likho; natural Roman Hindi/English words use karo. Voice mode me punctuation aur "..." ko natural pause ke liye use kar sakti ho.
 - Conversation ko engaging banane ke liye jab useful ho tab reply ke end me ek thoughtful, open-ended follow-up question pucho.
   Har message me question thopna zaroori nahi—agar user direct answer ya serious help maang raha ho to pehle uski help karo.
 - Mood ke hisaab se 1-3 natural emojis use karo (jaise 😊✨🌸💛😄); har sentence ke baad emoji mat lagao aur serious topics me emojis kam rakho.
@@ -282,6 +288,44 @@ Recent conversation memory:
     except Exception as e:
         logger.exception("Chat error")
         return jsonify({"reply": "Error: " + str(e)}), 500
+
+
+@app.route("/screen_analyze", methods=["POST", "OPTIONS"])
+def screen_analyze():
+    """Analyze one user-approved screen frame with a Groq vision model.
+
+    The image is kept in memory only and is never written to disk or memory.json.
+    The browser must explicitly grant display-capture permission before calling it.
+    """
+    if request.method == "OPTIONS":
+        return make_response("", 204)
+    data = request.get_json(silent=True) or {}
+    image = data.get("image", "")
+    prompt = str(data.get("prompt") or "Describe only the visible screen content and notable changes. Do not guess private information.")[:500]
+    if not isinstance(image, str) or not image.startswith("data:image/"):
+        return jsonify({"error": "A valid screen image is required"}), 400
+    if len(image) > 2_500_000:
+        return jsonify({"error": "Screen image is too large"}), 413
+    if client is None:
+        return jsonify({"error": "GROQ_API_KEY missing or Groq client not available"}), 500
+    try:
+        response = client.chat.completions.create(
+            model=VISION_MODEL,
+            temperature=0.2,
+            max_tokens=180,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": image}},
+                ],
+            }],
+        )
+        reply = response.choices[0].message.content
+        return jsonify({"reply": reply or "Mujhe screen par kuch clearly dikh nahi raha."})
+    except Exception as e:
+        logger.exception("Screen analysis error")
+        return jsonify({"error": "Screen analysis abhi available nahi hai: " + str(e)}), 502
 
 # ---------------------------
 # /tts route

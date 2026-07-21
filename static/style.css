@@ -44,6 +44,24 @@ h1 {
     transition: opacity 0.35s ease, transform 0.35s ease, height 0.35s ease;
 }
 
+.avatar-box.chat-talking {
+    filter: saturate(1.08) brightness(1.03);
+}
+
+.avatar-box.chat-talking::after {
+    content: "✨";
+    position: absolute;
+    right: 12%;
+    top: 14%;
+    animation: reactionSparkle 1.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes reactionSparkle {
+    0%, 100% { opacity: .35; transform: scale(.85) rotate(-8deg); }
+    50% { opacity: 1; transform: scale(1.15) rotate(8deg); }
+}
+
 .avatar-box.chat-hidden {
     opacity: 0;
     transform: translateY(-18px) scale(0.88);
