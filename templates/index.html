@@ -5,108 +5,248 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Anaya AI — Cute AI Companion</title>
+    <title>Anaya</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* PixiJS Live2D Display specific styles */
+        #live2d-container {
+            width: 500px;
+            height: 700px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        #live2d-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .model-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        .lipsync-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 50%;
+            z-index: 100;
+            transition: background 0.1s ease;
+        }
+
+        .lipsync-active {
+            background: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Animated circle in center - Enhanced for "real soul" effect */
+        .ai-circle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 100, 180, 0.15);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 100, 180, 0.3);
+            z-index: 1000;
+            opacity: 0.25;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(255, 100, 180, 0.1);
+        }
+
+        .ai-circle.active {
+            opacity: 0.9;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 100, 180, 0.3);
+            border-width: 3px;
+            border-color: rgba(255, 100, 180, 0.6);
+            box-shadow: 0 0 50px rgba(255, 100, 180, 0.8);
+            animation: soulPulse 2s infinite, gentleBreath 4s infinite;
+        }
+
+        @keyframes soulPulse {
+            0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 50px rgba(255, 100, 180, 0.8); }
+            25% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 0 60px rgba(255, 100, 180, 0.9); }
+            50% { transform: translate(-50%, -50%) scale(0.98); box-shadow: 0 0 40px rgba(255, 100, 180, 0.7); }
+            75% { transform: translate(-50%, -50%) scale(1.08); box-shadow: 0 0 70px rgba(255, 100, 180, 1.0); }
+            100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 50px rgba(255, 100, 180, 0.8); }
+        }
+
+        @keyframes gentleBreath {
+            0%, 100% { border-radius: 50%; }
+            25% { border-radius: 45% 55% 50% 50%; }
+            50% { border-radius: 55% 45% 50% 50%; }
+            75% { border-radius: 50% 50% 45% 55%; }
+            100% { border-radius: 50%; }
+        }
+
+        .ai-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-circle.active::before {
+            opacity: 1;
+            animation: sparkle 1.5s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        }
+
+        .microphone-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6a00 0%, #ffd500 100%);
+            border: none;
+            border-radius: 35px;
+            color: #111;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 15px 35px rgba(255, 123, 0, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .microphone-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(255, 123, 0, 0.35);
+        }
+
+        .microphone-button:active {
+            transform: translateY(0);
+            box-shadow: 0 12px 25px rgba(255, 123, 0, 0.3);
+        }
+
+        .microphone-active {
+            background: linear-gradient(135deg, #ff0000 0%, #ff8888 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>
+            <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="Hoshino AI Logo" class="anaya-logo" width="60" height="60">
+            <span class="brand-script">Anaya</span> AI
+        </h1>
 
-<div class="container">
-
-    <h1>🌸 <span class="brand-script">Anaya</span> AI</h1>
-
-    <!-- 3D Avatar Area -->
-    <div class="avatar-box">
-        <div id="avatar"></div>
-    </div>
-
-    <!-- AI Response -->
-    <div class="chat-box">
-        <p id="response"></p>
-    </div>
-
-    <!-- Controls -->
-    <div class="controls">
-        <button id="talkBtn">🔊 Talk</button>
-        <button id="chatBtn" class="chat-open-btn" type="button">💬 Chat</button>
-    </div>
-
-    <div class="screen-watch-box" aria-label="Screen watching controls">
-        <button id="screenWatchBtn" type="button"><span>🖥️</span> Vision</button>
-        <button id="screenStopBtn" type="button" hidden>⏹ Stop Vision</button>
-        <span id="screenStatus" class="screen-status" aria-live="polite">Off</span>
-    </div>
-
-    <!-- Song Player -->
-    <div class="song-box">
-        <button id="songBtn">🎵 Song Play</button>
-        <p id="songStatus" class="song-status" aria-live="polite"></p>
-
-        <iframe
-            id="ytplayer"
-            width="560"
-            height="315"
-            frameborder="0"
-            allow="autoplay; encrypted-media">
-        </iframe>
-    </div>
-
-</div>
-
-<!-- Snapchat-style AI chat overlay -->
-<section id="chatOverlay" class="chat-overlay" aria-hidden="true" aria-label="AI chat">
-    <div class="chat-panel">
-        <header class="chat-header">
-            <div class="chat-profile">
-                <div class="chat-avatar">🌸</div>
-                <div>
-                    <strong>Anaya AI</strong>
-                    <span><i></i> Online</span>
-                </div>
+        <!-- Live2D Avatar Container -->
+        <div class="avatar-box">
+            <div id="live2d-container">
+                <canvas id="live2d-canvas" width="500" height="700"></canvas>
+                <div id="model-info" class="model-info">Model: Loading...</div>
+                <div id="lipsync-indicator" class="lipsync-indicator"></div>
             </div>
-            <button id="closeChatBtn" class="chat-close-btn" type="button" aria-label="Close chat">×</button>
-        </header>
-
-        <div id="chatMessages" class="chat-messages" aria-live="polite">
-            <div class="message ai-message">Namaste! Main Anaya hoon — tumhari sweet aur caring AI companion. Aaj kis baat par dil se baat karni hai? ✨😊</div>
         </div>
 
-        <form id="chatForm" class="chat-input-row">
-            <input id="chatInput" type="text" autocomplete="off" placeholder="Message Anaya AI..." aria-label="Message Anaya AI" required>
-            <button id="chatSendBtn" type="submit" aria-label="Send message">➤</button>
-        </form>
+        <!-- Controls -->
+        <div class="controls">
+            <button id="talkBtn">🔊 Talk</button>
+            <button id="chatBtn" class="chat-open-btn" type="button">💬 Chat</button>
+        </div>
+
+        <!-- AI Response -->
+        <div class="chat-box">
+            <p id="response"></p>
+        </div>
     </div>
-</section>
 
-<!-- Three.js -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <!-- AI Circle Animation -->
+    <div id="aiCircle" class="ai-circle"></div>
 
-<script>
-    window.modelUrl = "{{ url_for('static', filename='models/modelToUsed.glb') }}";
+    <!-- Snapchat-style AI chat overlay -->
+    <section id="chatOverlay" class="chat-overlay" aria-hidden="true" aria-label="AI chat">
+        <div class="chat-panel">
+            <header class="chat-header">
+                <div class="chat-profile">
+                    <div class="chat-avatar">🌸</div>
+                    <div>
+                        <strong>Anaya AI</strong>
+                        <span><i></i> Online</span>
+                    </div>
+                </div>
+                <button id="closeChatBtn" class="chat-close-btn" type="button" aria-label="Close chat">×</button>
+            </header>
 
-    // AI response handle
-    function handleAIResponse(message){
-        document.getElementById("response").innerText = message;
+            <div id="chatMessages" class="chat-messages" aria-live="polite">
+                <div class="message ai-message">Hello! I'm Anaya 🌸. You can talk to me using the microphone! 🎤✨</div>
+            </div>
 
-        // Agar user bole "song sunao"
-        if(message.toLowerCase().includes("song sunao")){
-            let songName = message.replace("song sunao", "").trim();
-            playSong(songName); // yaha tumhara JS function call hoga
+            <form id="chatForm" class="chat-input-row">
+                <input id="chatInput" type="text" autocomplete="off" placeholder="Type a message..." aria-label="Message Anaya AI" required>
+                <button id="chatSendBtn" type="submit" aria-label="Send message">➤</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- PixiJS and Live2D Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@pixi/live2d-display@0.4.0/dist/pixi-live2d-display.min.js"></script>
+
+    <!-- Live2D Model Initialization -->
+    <script src="{{ url_for('static', filename='pixi-live2d-display.js') }}"></script>
+
+    <!-- Three.js (kept for compatibility) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
+    <script>
+        window.modelUrl = "{{ url_for('static', filename='models/Hoshino_Ai.model3.json') }}";
+        window.basePath = "{{ url_for('static', filename='models/') }}";
+
+        // AI response handle
+        function handleAIResponse(message) {
+            document.getElementById("response").innerText = message;
         }
-    }
+    </script>
 
-    // Example: simulate AI response
-    // handleAIResponse("song sunao Tum Hi Ho");
-</script>
-
-<!-- Your JavaScript -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-
+    <!-- Your JavaScript -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>

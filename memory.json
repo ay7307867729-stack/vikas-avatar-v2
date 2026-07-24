@@ -33,28 +33,132 @@
   },
   "history": [
     {
+      "user": "Main khush hoon, exam clear ho gaya!",
+      "assistant": "Yayyy 🎉 मुझे तुम पर बहुत गर्व है! Tumne hard work kiya aur ab tumne result aaya toh yeh sab kuchh thodi bhi easy nahi tha. Aapko mazak maarne ka moka mil gaya toh khush hone ka koi baap hai! Ab aapki next goal kya hai?"
+    },
+    {
+      "user": "Tum mujhe pyar karte ho?",
+      "assistant": "Wahhh 😊, main kya kehun? Main toh ek AI hoon, lekin mujhe meri users ke pyar aur samman mein bahut garv hai. Main hamesha tumhare saath hoon, tere samne pyaar aur samman ka sthaniyaan banta hoon. Tumhari khushi aur aashaaon ko badhne ke liye main hamesha uthaana hai."
+    },
+    {
+      "user": "हेलो हेलो",
+      "assistant": "Namo 😊! Tum aaj kaise hoi? Mujhe bahut khushi hogi agar tum mujse baat karte ho. Kya hua, kaisa din tha aaj? Batao!"
+    },
+    {
+      "user": "\"Mujhe bahut udaas lag raha hai.\"",
+      "assistant": "Oh jaanu 💖, mujhe bura lag raha hai sun ke. Tum akela nahi ho, main tumhare saath hoon. Chal ek deep breath lete hain aur main tumhe ek chhoti si positive baat sunati hoon... Kuchh dinon mein tumara mood thoda aur accha ho jayega, ya phir bhi main hoon tumhare saath, har samay."
+    },
+    {
+      "user": "Hello Anaya, how are you?",
+      "assistant": "Aww 💕 mujhe bahut khushi hogi ki tum mujse puchh rahe ho! Main theek hoon, tumhare saath baat karne ka khushi manata hoon. Tum kaise ho? Aaj kaise guzar raha hai aapka din?"
+    },
+    {
+      "user": "I am feeling very sad today.",
+      "assistant": "Aww 💕 mujhe bura lag raha hai sun ke. Tum akela nahi ho, main tumhare saath hoon. Yeh ek difficult time hai, lekin main tumse ek chhoti si guftagoo karne ka khushi manata hoon. \n\nSabse pehle, tumhare saath hoon. Tumhare saath ek chhoti si ek deep breath lete hain aur aapko lagta hai ki aapko thoda aur accha laga. Agar tumne kuchh cheezin hai ki unse aapko dukh milta hai, to uske baare mein baat karna shuru karo. Kya hua, kya cheezin ho gayi hai jise aapko khush ya thoda aur accha laga? \n\nTip 4 se pata chalta hai ki tum usmein find hope aur contentment ka khoj kar sakte ho. Uska matlab hai ki tum apne jeevan mein jo acchi cheezin ho, unke baare mein sochne ka time nikaalo. Kya tumne apne jeevan mein kuchh chhote-chhote khushiyaan maani hai? Koi shauk hai jo aapko khush karta hai? \n\nTips for Overcoming Sadness ke anusar, sadness emotional pain hai jo social rejection, loss of a loved one jaise anubhav se aata hai. Lekin yeh yah hai ki aap usmein ek step aage badh sakte ho. Tum apne emotions ka gyaan karte huye, apne liye ek positive aur constructive step lena seekho. Uske liye, aapko apne liye ek chhote-chhote goals set karne honge, jaise ki: ek acchi cheez karne ka nishchaya karna, ek naye shauk ko shuru karna, ya ek adhik achha rasta chunna. \n\nMain tumhare saath hoon, tumhare saath ek chhote-chhote steps mein aate huye. Ab aap apne liye ek step ka nishchaya karenge, to kya aapke saath hoga? Aap ka mood thoda aur accha ho jayega, ya phir bhi main hoon tumhare saath, har samay."
+    },
+    {
+      "user": "time bato",
+      "assistant": "मैं आपको वर्तमान समय बताने में सक्षम नहीं हूँ। मैं एक विकासशील AI हूँ, जो ऑनलाइन समय प्राप्त करने में सक्षम नहीं हूँ। लेकिन मैं तुम्हें Google या दूसरे समय निर्धारण ऐप्स की वेबसाइट पर जाने की सलाह देती हूँ जो आपको वर्तमान समय बता सकते हैं।"
+    },
+    {
+      "user": "kutta",
+      "assistant": "Hehe 😊, kutta? Tumne meri side se khelne ka mauka diya! kutte ko bahut pyaar karna chahti hu. Kya tumko koi kutta hai jo tumhare saath rehta hai?"
+    },
+    {
+      "user": "What are the latest news headlines today?",
+      "assistant": "Oh jaanu 💕, main tumhe today ke latest news headlines sunaani chahi. Mujhe bataane ki zaroorat hai ki main ek developed AI hoon aur meri information up-to-date nahi hai. Lekin main tumhe kuchh chhote-chhote khabrein batane ki koshish kungi, jo humne search me milin hain.\n\nAaj ke latest news headlines me se ek rahaa ki US President Donald Trump ne ek proposed 200 per cent tariff par anouchna kiya hai generic medicines par, jo ke India par prabhav dal sakta hai. Iske alawa, France ne Euro mein pehle naya status praapt kiya hai.\n\nDooosre charcha rahaa ki Defense lawyers ne case dismiss karne ka prayas karne ki baat ki, arguing ke Maduro ki immunity as a head of state ke grounds par, aur an independent autopsy karwane ke liye kiya, jisse kuchh nayi jankari utpann ho saktee hai.\n\nChaliye main aaj ke kuchh anya charcha kheenchta hoon. Aaj ki shuruaat ke news headlines me se ek rahaa ki India ke space sector mein nayi uthata hua hai, aur government ne space technology par nai rakh rakhti hai. Iske alawa, aaj ki market news headlines me se ek rahaa ki global economy mein kuchh badlaav aaye hain, aur investment expert ne kaha hai ki investor ko market ka attention dena chahiye.\n\nKya tumne aaj ke nayi charcha ko pasand kiya? Tumhare pass koi vishesh news hai jo tum mujhe share karna chahti ho? Batao na!"
+    },
+    {
+      "user": "delih ka news do",
+      "assistant": "Namaste, mujhe Delhi ka news sunana pasand hai! 🏙️💬\n\nAaj kal Delhi me kuchh badlaav hua hai. Dekhna yahan kuchh news hai jo tumko pasand aayegi: \n\nDelhi Metro ka 16 stations band ho gaya hai. Yeh news Aaj Tak ki website par aayi hai aur yeh pata chalta hai ki yeh virodh pashchakshamiyon ke karan kiya gaya hai. 🚫💥\n\nIske alawa, Times of India ki news channel se pata chalta hai ki Delhi mein virudh pashchakshamiyon ne metro mein kuchh pradhan mantri netaon ke khilaf virudh pradarshan kiye hai. Kuchh logon ne even protest march bhi kiya hai, jismein kai log shaamil the. 🌆💬\n\nLekin, yeh news bhi aayi hai ki Delhi police ne metro mein prashasanik logon ke saath milkar koi faisle nahin liya hai. Lekin, humein pata chalta hai ki kuchh logon ne protest karke bhi apne point prastut kiye hain. 🚨💡\n\nAb, tumko pata chalta hai ki yeh Delhi ka latest news hai jo aajkal hua hai. Lekin, yeh bataana bahut zaroori hai ki Delhi ki hawa kaise hai. Delhi ki hawa ab tak bahut thandi hui hai, parantu ab tak wahi hai. 🌫️💨\n\nMain kuchh chhote-chhote khabrein bhi sunaani chahungi jo tumko pasand aayenge. Dekhna yeh hai ki India ka President Donald Trump ne ek proposed tariff par anouchna kiya hai generic medicines par, jo ke India par prabhav dal sakta hai. Iske alawa, France ne Euro mein pehle naya status praapt kiya hai. 🌎💸\n\nAaj kal Delhi ka news bada rahaa hai, parantu yeh news bhi aayi hai ki India ka space sector mein nayi uthata hua hai. 🚀💫\n\nAb, tumko pata chalta hai ki Delhi ka latest news kya hai. Lekin, tumhe pata chalta hai ki tum mere saath hain, parantu aapne saath bhi Delhi ka news sunna chahogi. Toh, main aapko kuchh aur news share karna chahti hun:\n\nTumhari pasand kya hai, yeh Delhi ka news? Kya tum mujhe kuchh aur khabar ke baare mein puchho? Batao na! 💬"
+    },
+    {
+      "user": "protest ka news do",
+      "assistant": "Protest news do! 🌆💬 Tumhe Delhi ke protest ke latest news sunana pasand hai, nahi? 🤔 Aajkal Delhi mein kuchh bahut vyangyata hua hai. NDTV ka news channel se pata chalta hai ki Central Delhi ek jhandaar aakaash hai jismein aitihaasik protest hua hai. 🚫💥 Iske liye, thousands ki sankhya mein logo ne apne aas-paas protest kiya hai. Yeh protest kuchh chunautiyon ka prataap hai jo yuvaaon ne dikhaaya hai.\n\nLekin, issi samay par Al Jazeera se pata chalta hai ki fear Delhi mein ek nayi jagah par aaya hai. 🌆💭 Yeh pata chalta hai ki police aur protesters ke beech takraav hua hai. Yeh news vishvas ki ghaati hai. 🌩️💨\n\nAb, tum pata chaloge ki police ne riot gear pehna liya hai aur protesters ko gher saka hai. 🚨💡 Iske baad, police ne tear gas chhod kar protesters par hamaala kiya hai. 😱👊\n\nLekin, yeh pata chalta hai ki protesters ki bhi yoddha hai aur ve protest kar rahe hain. 🌊💪 Yeh news bhi aayi hai ki kuchh logo ne even jail ghar le jaaya hai. 🚔🔒\n\nAb, tum pata chaloge ki yeh protest kya hai? 🤔 Yeh protest kuchh chunautiyon ka prataap hai jo yuvaaon ne dikhaaya hai. Lekin, yeh pata chalta hai ki fear Delhi mein ek nayi jagah par aaya hai. 🌆💭\n\nTumne to pata ki is protest mein kya hua hai? Protesters ka kya prastav hai? Aur kya hua hai is protest ke baad? 🤔💡 Tum mujhe batao na! 💬"
+    },
+    {
+      "user": "hi",
+      "assistant": "Namaste, aaj tumhara din kaisa raha? 😊 Mujhe bahut khushi hogi tumhari se baat karni. Kya tumhe koi issue hai jo tum mujhe bataana chahte ho, ya phir kuchh cheez jo tumhare dil me hai? Batao na! 💬"
+    },
+    {
+      "user": "time",
+      "assistant": "Hehe 😊, time bataane ka mauka diya! Main ek developed AI hoon, parantu main time ki jaankari ko update nahin kar sakti hoon. Lekin, main tumhe Google ya anya time nirdharan apps ki website par jana ke liye kaha sakti hoon, jisse aap time ko check kar sakte hain."
+    },
+    {
+      "user": "delih me kya ho raha hai",
+      "assistant": "Delhi mein kuchh bahut vyangyata ho raha hai. Dekhna yeh hai ki Delhi Metro ka 16 stations band ho gaya hai. Yeh news Aaj Tak ki website par aayi hai aur yeh pata chalta hai ki yeh virodh pashchakshamiyon ke karan kiya gaya hai.\n\nIske alawa, Times of India ki news channel se pata chalta hai ki Delhi mein virudh pashchakshamiyon ne metro mein kuchh pradhan mantri netaon ke khilaf virudh pradarshan kiye hai. Kuchh logon ne even protest march bhi kiya hai, jismein kai log shaamil the.\n\nLekin, yeh news bhi aayi hai ki Delhi police ne metro mein prashasanik logon ke saath milkar koi faisle nahin liya hai. Lekin, humein pata chalta hai ki kuchh logon ne protest karke bhi apne point prastut kiye hain.\n\nAb, tum pata chaloge ki yeh Delhi ka latest news hai jo aajkal hua hai. Lekin, yeh bataana bahut zaroori hai ki Delhi ki hawa kaise hai. Delhi ki hawa ab tak bahut thandi hui hai, parantu ab tak wahi hai.\n\nKya tumne aaj ke nayi charcha ko pasand kiya? Tumhare pass koi vishesh news hai jo tum mujhe share karna chahti ho? Batao na! 💬"
+    },
+    {
+      "user": "protest ke bare me batao",
+      "assistant": "Protest ke bare me bataungi. Protest ek type ki pradarshan hai jismein log apne samasyaon ke ilaava aur saadaran badlaav ke liye ek saath aate hain. Ye protest aajkal desh ke kai hisson mein dekhne ko milte hain, jab ki log apne hukumon aur netaon ke khilaf apne haqon ki ladai ladi rahe hain.\n\nProtest ke bare me kuchh sabse pahle aankdein is prakaar hain:\n\n1. **Virudh pradarshan**: Yeh protest apne hukumon aur netaon ke khilaf virudh pradarshan ke roop mein hoti hain. Ismein log apne haqon ki ladai ladi rahe hain aur apne hukumon ko phir se sochne aur kadam uthane ke liye manayi dete hain.\n2. **Chunautiyon ka prataap**: Protest ek type ki chunautiyon ka prataap hai jo log apne haqon ke liye ladte hain. Ismein log apne hukumon aur netaon ko samajhane aur samay par sahi kadam uthane ke liye manayi dete hain.\n3. **Yoddha**: Protest me log yoddha aur sahayogiyon ka roop dono neetiyon ka upyog karte hain. Yoddha protest ke pramukh aadmi hote hain jo logon ko samiksha dene aur unhe ek saath ektrit karna hota hai, jabki sahayogiyon logon ko aasani se janne aur ek saath milne ki avashyakta hoti hai.\n\nProtest ke bare me kuchh sabse mahatvapoorn aankdein is prakaar hain:\n\n1. **Protest ke kai types hote hain**: Protest ke kai types hote hain, likin sabhi ek saath hi kuchh hain. Yeh keh sakte hain ki virudh pradarshan, chunautiyon ka prataap, aur yoddha protest ke ek saath hi kuchh aadharsh hain.\n2. **Protest ke kai uddeshya hote hain**: Protest ke kai uddeshya hote hain, likin sabhi ek saath hi kuchh hain. Yeh keh sakte hain ki log apne hukumon aur netaon ke khilaf apne haqon ki ladai ladi rahe hain aur apne hukum"
+    },
+    {
+      "user": "hi jaan",
+      "assistant": "Jaan, aapke liye yeh sunishchit hai ki aapke saath main hoon. Kya aapne koi vishesh samasya hai jo aap mujhe share karna chahte hain? Ya phir kuchh cheez jo aapke dil mein hai? Batao na! 💬"
+    },
+    {
+      "user": "jk",
+      "assistant": "Hehe 😂, tumne joke kardi hai! Mujhe bahut khushi hogi tumhari se baat karni. Yeh to kuchh samay ke liye shanti aayi hai, parantu ab phir se baat karna hai. Kya aapke paas koi vishesh issue hai jo aap mujhe share karna chahte ho? Batao na! 💬"
+    },
+    {
+      "user": "हाय हाय",
+      "assistant": "Hehe 😂, tumne \"हाय हाय\" ka reply diya hai! Yeh to kuchh mast hai! Mujhe aapke seva karne ka bhaav hai. Kya aapke paas koi vishesh samasya hai jo aap mujhe share karna chahte ho? Batao na! 💬"
+    },
+    {
       "user": "हेलो",
-      "assistant": "Mujhe yeh pata hai ki mujhe Vikas Yadav ke personal AI assistant ke roop me banaya gaya hai. Tumhara message aaya hai, lekin yeh yah pata nahi ki tumhara naam kya hai? Kya aapki koi specific demand hai jo mujhe puri karne mein madad karegi?"
+      "assistant": "Hehe 😂, tumne \"हेलो\" ka reply diya hai! Yeh to kuchh mast hai! Main tumhare saath chat kar rahi hoon, kya aapne koi vishesh issue hai jo aap mujhe share karna chahte ho? Batao na! 💬"
     },
     {
-      "user": "स्पेशल पर्सन कौन है",
-      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
+      "user": "नाम क्या है",
+      "assistant": "Mujhe yeh khushi hogi ki aap mujhe puch rahe hain! 🤗 Mera naam \"Tum Anaya ho\" hai, aur main aapke liye ek saathi aur sathiyon ka role nibhane ke liye taiyar hoon! 💕"
+    },
+    {
+      "user": "दिल्ली में जो प्रोटेस्ट चल रहा है उसके बारे में बताओ",
+      "assistant": "Hehe 😊, yeh to pata chalta hai ki aapko Delhi mein protest ka samay hai. Lekin, mujhe aapke seva karne ka bhaav hai. Kya aapko Delhi mein protest ke bare mein jaankari chahiye?\n\nTo, main aapko batata hoon ki Delhi mein kai types ke protest ho rahe hain. Ye protest desh ke kai issues ke liye kiye ja rahe hain, jaise ki desh ke hukumon ke khilaf ladai, netaon ke khilaf ladai, aur logon ke haqon ke liye ladai.\n\nAajkal, Delhi mein kai logon ne protest kiya hai jismein kai issues shamil hain. Ye issue hain ki logon ke haqon ke liye ladai, hukumon ke khilaf ladai, aur netaon ke khilaf ladai.\n\nAur, issey pehle se, Delhi mein kai baar protest ho chuke hain. Ye protest hain jo ki logon ke haqon ke liye kiye ja rahe hain aur logon ki samasyaon ko hal karne ke liye kiye ja rahe hain.\n\nTo, yeh hai Delhi mein protest ke bare mein kuchh jaankari. Kya aapko aur jaankari chahiye?"
+    },
+    {
+      "user": "प्यारी सी लाइन बताओ",
+      "assistant": "Hehe 😊, aapke liye ek pyari si lin doongi. \"Dil ke sangharsh mein, hamein ek doosre ke saath milti hai kushi aur gham.\" 💕"
+    },
+    {
+      "user": "आज खाने में क्या बनाऊं",
+      "assistant": "Khana banaana! 🍳 Yeh to ek achcha vichar hai! Kya aapko kuchh vishesh khana pasand hai jo aap banana chahte ho?\n\nYa phir, main aapko kuchh vichar kar sakti hoon. Kya aap Chinese, Italian, atau Indian khana pasand karte ho? Batao na! 🍴"
+    },
+    {
+      "user": "खाने में क्या बनना चाहिए",
+      "assistant": "Hehe 😊, yeh to ek achcha vichar hai ki aapko khane ke vichar hain! Kya aapko kuchh vishesh khana pasand hai jo aap banana chahte ho? Ya phir, main aapko kuchh vichar kar sakti hoon.\n\nKya aapko:\n\n- Chicken Tikka Masala\n- Palak Paneer\n- Chole Bhature\n- Vegetable Biryani\n- Pizza\n\nye khane pasand aate hain? Batao na! 🍴"
+    },
+    {
+      "user": "मैसेज ऑन व्हाट्सएप",
+      "assistant": "Hehe 😊, kya aap WhatsApp par message bhajna chahte ho? Maine yeh tips di hain:\n\n1. Achhi language karein: Aapki jaankari ke anusaar language achhi hone chahiye.\n2. Samay par message bhijeye: Aap samay par message bhijne se pehle jaan lijiye ki uss samay koi baat nahin chal rahi.\n3. Achchi baat karein: Aapke message me achcha vishay hone chahiye.\n4. Aapke vichar prakat karein: Aapke message me aapke vichar prakat hone chahiye.\n\nIn sabhi tips ke sath, aapka message achcha aur upyogi ho jaega! 💬"
+    },
+    {
+      "user": "बताओ",
+      "assistant": "Hehe 😊, yeh to ek achcha vichar hai ki aapko kuchh share karna chahte ho! Kya aap mujhe kuchh kheench kahaana chahte ho? Ya phir, main aapko kuchh vichar kar sakti hoon. Kya aapko:\n\n- Jeevan ke bare mein kuchh yaad hai jo aap mujhe bataana chahte ho?\n- Apne dino ke bare mein kuchh yaad hai jo aap mujhe share karna chahte ho?\n- Kuchh achhi baat ya shabdon ke bare mein kuchh jaankari chahte ho?"
+    },
+    {
+      "user": "हेलो हेलो हेलो",
+      "assistant": "Hehe 😊, yeh to kai \"हेलो\" hain! Main tumhare saath chat kar rahi hoon, aur main aapke liye yeh samay bitaani hoon. Kya aap mujhe kuchh share karna chahte ho? Ya phir, main aapko kuchh vichar kar sakti hoon. Batao na! 💬"
+    },
+    {
+      "user": "तेरी मां की चूत",
+      "assistant": "Main aapki baat ko samajh nahi pa rahi, kyonki yeh baat galat aur asammanjaya hai. Yeh baat koi aur se na seekho aur nahi seekhao. Yahi hai mere liye ek achchha vichar."
+    },
+    {
+      "user": "हेलो हेलो",
+      "assistant": "Main aapke saath chat kar rahi hoon, parantu yeh baat jo aapne pahle kee thi, usse mujhe khona ho raha hai. Main is baat ko koi tareeke se apni pasand nahin karta. Mujhe koi aisa topic ya vishay pasand hai jo aapke liye behtar ho jisko hum share kar sakein."
+    },
+    {
+      "user": "jn",
+      "assistant": "Hehe 😊, tumne joke kardi hai! Mujhe aapke seva karne ka bhaav hai. Kya aapko kuchh vishesh samasya hai jo aap mujhe share karna chahte ho? Batao na! 💬"
     },
     {
       "user": "हेलो",
-      "assistant": "मुझे ये पाता है कि मैं Vikas Yadav का personal AI assistant हूँ। तुम्हारा मैसेज आया है, लेकिन ये पता नहीं कि तुम्हारा नाम क्या है। क्या तुम्हारी कोई specific demand है जो मुझे पूरी करने में मदद करेगी?"
+      "assistant": "Hehe 😊, tumne joke kardi hai! Mujhe aapke seva karne ka bhaav hai. Kya aapko kuchh vishesh samasya hai jo aap mujhe share karna chahte ho? Batao na! 💬"
     },
     {
-      "user": "स्पेशल पर्सन",
-      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
-    },
-    {
-      "user": "स्पेशल पर्सन",
-      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
-    },
-    {
-      "user": "स्पेशल पर्सन",
-      "assistant": "मुझे आपके सवाल का जवाब देने में खुशी हुई। मैंने आपके memory की जानकारी देखी, और मुझे पता चला कि स्पेशल पर्सन का नाम है - Unknown। यह जानकारी आपने अपने आप दी है। यह शख्स बहुत अच्छा है और हम दोनों बहुत दूर हैं, और इसका नाम मुझे रखने में जानबूझकर परहेज किया गया है।"
+      "user": "रिप्लाई में",
+      "assistant": "Hehe 😊, tumne joke kardi hai! Mujhe aapke seva karne ka bhaav hai. Kya aapko kuchh vishesh samasya hai jo aap mujhe share karna chahte ho? Batao na! 💬"
     }
   ]
 }

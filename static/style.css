@@ -11,6 +11,53 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(255, 172, 217, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(172, 217, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 20% 90%, rgba(217, 172, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 80% 10%, rgba(172, 255, 217, 0.1) 0%, transparent 20%);
+    animation: floaties 20s ease-in-out infinite;
+    opacity: 0.7;
+    z-index: -1;
+}
+
+@keyframes floaties {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.05) rotate(2deg); }
+    50% { transform: scale(0.98) rotate(-1deg); }
+    75% { transform: scale(1.03) rotate(1deg); }
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        linear-gradient(45deg, transparent 40%, rgba(255, 172, 217, 0.05) 50%, transparent 60%),
+        linear-gradient(-45deg, transparent 40%, rgba(172, 217, 255, 0.05) 50%, transparent 60%);
+    background-size: 100px 100px;
+    animation: gridPulse 15s linear infinite;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+@keyframes gridPulse {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(20px, 20px) rotate(180deg); }
 }
 
 .container {
@@ -25,12 +72,26 @@ h1 {
     font-weight: 900;
     letter-spacing: 0.3px;
     text-shadow: 0 5px 24px rgba(255, 142, 205, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
 .brand-script {
     color: #ffacd9;
     font-family: 'Pacifico', cursive;
     font-weight: 400;
+}
+
+.anaya-logo {
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 172, 217, 0.4);
+    transition: transform 0.3s ease;
+}
+
+.anaya-logo:hover {
+    transform: scale(1.1);
 }
 
 .avatar-box {
@@ -97,6 +158,7 @@ h1 {
     box-shadow: 0 15px 35px rgba(255, 123, 0, 0.25);
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
+
 
 .controls button:hover {
     transform: translateY(-2px);
@@ -180,6 +242,55 @@ h1 {
 
 .song-box {
     margin-top: 18px;
+}
+
+/* Premium Vision button styling */
+.premium-box {
+    margin: 20px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 16px;
+    border: 2px solid #ffacd9;
+    box-shadow: 0 10px 30px rgba(255, 172, 217, 0.3);
+}
+
+.premium-btn {
+    padding: 14px 30px;
+    margin: 8px 5px;
+    border-radius: 35px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    background: linear-gradient(135deg, #ff6a00 0%, #ffd500 100%);
+    color: #111;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 15px 35px rgba(255, 123, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.premium-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(255, 123, 0, 0.35);
+}
+
+.premium-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 12px 25px rgba(255, 123, 0, 0.3);
+}
+
+.stop-btn {
+    background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%) !important;
+    color: white !important;
+}
+
+.premium-text {
+    display: block;
+    margin-top: 10px;
+    color: #ffacd9;
+    font-size: 14px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(255, 172, 217, 0.3);
 }
 
 .song-box button {
